@@ -5,6 +5,10 @@ const pool = require('../config/db');
 const registerUser = async (req, res) => {
   const { name, email, password, role } = req.body;
 
+  if (role !== 'facilitator') {
+    return res.status(400).json({ message: 'Only facilitators can register' });
+  }
+
   //Check if user already exists
   const checkUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
   if (checkUser.rows.length > 0) {
