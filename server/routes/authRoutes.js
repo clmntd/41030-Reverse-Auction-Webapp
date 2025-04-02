@@ -30,16 +30,32 @@
 
 // module.exports = router;
 
+/////////////////////////////////////////
 
 const express = require('express');
 const router = express.Router();
 const { registerUser, loginUser } = require('../controllers/authController');
 
-router.post('/register', registerUser);
-router.post('/login', loginUser);
+router.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  next();
+});
+
+router.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  res.json({ message: `Login attempt for ${username}` });
+});
+
+router.post('/register', (req, res) => {
+  const { username, password } = req.body;
+  res.json({ message: `User ${username} registered successfully!` });
+});
+
+console.log("✅ authRoutes file loaded:", __filename);
+console.log(router.stack.map(layer => layer.route?.path || "Middleware"));
 
 router.get('/test', (req, res) => {
-    res.json({ message: "Test route works!" });
+    res.json({ message: "Auth route works!" });
   });
 
 module.exports = router;

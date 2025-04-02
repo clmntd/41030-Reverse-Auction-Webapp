@@ -1,72 +1,55 @@
 const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
 const cors = require('cors');
-const dotenv = require('dotenv');
+const bodyParser = require('body-parser');
+
 const authRoutes = require('./routes/authRoutes');
 const auctionRoutes = require('./routes/auctionRoutes');
 const bidRoutes = require('./routes/bidRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
-const pool = require('./config/db');
-
-dotenv.config();
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
 
-//Middleware
+// Middleware
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
-//Routes
+// Register Routes with a Base Path
 app.use('/api/auth', authRoutes);
 app.use('/api/auctions', auctionRoutes);
 app.use('/api/bids', bidRoutes);
 app.use('/api/transactions', transactionRoutes);
 
-//Real-time bidding
-io.on('connection', (socket) => {
-  console.log('A user connected');
+console.log("Registering routes...");
 
-  //Listen for bid
-  socket.on('placeBid', (bidData) => {
-    //Broadcast the bid data to all connected clients
-    io.emit('newBid', bidData);
-  });
+console.log("✅ Auth routes loaded");
+console.log("✅ Auction routes loaded");
+console.log("✅ Bid routes loaded");
+console.log("✅ Transaction routes loaded");
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
-  });
-});
+console.log("Routes registered successfully!");
 
-app.use((req, res, next) => {
-  console.log(`Incoming Request: ${req.method} ${req.url}`);
-  next();
-});
+//Route Debugging (Ensure All Routes Are Logged)
+console.log("Registered Routes:");
+if (app._router && app._router.stack) {
+    app._router.stack.forEach((middleware) => {
+        if (middleware.route) {
+            //Directly registered route
+            console.log(`🔹 ${Object.keys(middleware.route.methods).join(", ").toUpperCase()} ${middleware.route.path}`);
+        } else if (middleware.name === "router" && middleware.handle.stack) {
+            //Nested routes inside a router
+            middleware.handle.stack.forEach((route) => {
+                if (route.route) {
+                    console.log(`🔹 ${Object.keys(route.route.methods).join(", ").toUpperCase()} ${route.route.path}`);
+                }
+            });
+        }
+    });
+} else {
+    console.log("❌ No routes found!");
+}
 
-app._router.stack.forEach((r) => {
-  if (r.route && r.route.path) {
-    console.log(`Route: ${r.route.path}`);
-  }
-});
-
-app.get('/', (req, res) => {
-  res.send('Server is running');
-});
-
-app.get('/api/test', (req, res) => {
-  res.json({ message: "Test route is working!" });
-});
-
-app.post('/api/auth/login', (req, res) => {
-  res.json({ message: "Direct login route works!" });
-});
-
-app.get('/api/auth/test', (req, res) => {
-  res.json({ message: "Auth test route works!" });
-});
-//Start server
-server.listen(5000, () => {
-  console.log('Server running on http://localhost:5000');
+//Start the server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
 });
