@@ -38,4 +38,8 @@ const { registerUser, loginUser } = require('../controllers/authController');
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 
+router.get('/test', (req, res) => {
+    res.json({ message: "Test route works!" });
+  });
+
 module.exports = router;

@@ -40,6 +40,32 @@ io.on('connection', (socket) => {
   });
 });
 
+app.use((req, res, next) => {
+  console.log(`Incoming Request: ${req.method} ${req.url}`);
+  next();
+});
+
+app._router.stack.forEach((r) => {
+  if (r.route && r.route.path) {
+    console.log(`Route: ${r.route.path}`);
+  }
+});
+
+app.get('/', (req, res) => {
+  res.send('Server is running');
+});
+
+app.get('/api/test', (req, res) => {
+  res.json({ message: "Test route is working!" });
+});
+
+app.post('/api/auth/login', (req, res) => {
+  res.json({ message: "Direct login route works!" });
+});
+
+app.get('/api/auth/test', (req, res) => {
+  res.json({ message: "Auth test route works!" });
+});
 //Start server
 server.listen(5000, () => {
   console.log('Server running on http://localhost:5000');
