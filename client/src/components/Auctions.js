@@ -9,7 +9,7 @@ const Auctions = () => {
   const [price, setPrice] = useState('');
   const [quality, setQuality] = useState(3);
   const [currentBids, setCurrentBids] = useState([]);
-
+  const role = JSON.parse(localStorage.getItem('role'));
   useEffect(() => {
     const fetchAuctions = async () => {
       try {

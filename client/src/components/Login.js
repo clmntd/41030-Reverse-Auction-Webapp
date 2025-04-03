@@ -11,8 +11,10 @@ const Login = ({ setUser }) => {
     try {
       const response = await api.post('/auth/login', { email, password });
       localStorage.setItem('token', response.data.token); //Store JWT token
+      //Fix and make setUser
       localStorage.setItem('user', JSON.stringify(response.data.user));
-      // setUser(response.data); //Set user data
+      localStorage.setItem('role', JSON.stringify(response.data.role));
+      //setUser(response.data); //Set user data
       //setuser sets role of the 
       //Redirect or navigate to the dashboard
       window.location.href = '/dashboard';
