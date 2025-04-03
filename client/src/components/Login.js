@@ -4,15 +4,19 @@ import api from '../api';
 const Login = ({ setUser }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const response = await api.post('/auth/login', { email, password });
       localStorage.setItem('token', response.data.token); //Store JWT token
-      console.log(response.data);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
       // setUser(response.data); //Set user data
+      //setuser sets role of the 
       //Redirect or navigate to the dashboard
+      window.location.href = '/dashboard';
+
     } catch (err) {
       console.error('Error logging in:', err);
     }

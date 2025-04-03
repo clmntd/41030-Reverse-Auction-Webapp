@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
 
+
 const Dashboard = ({ user }) => {
   const [transactions, setTransactions] = useState([]);
-
+  user = JSON.parse(localStorage.getItem('user'));
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
