@@ -59,12 +59,26 @@ router.post('/login', async (req, res) => {
 
 // router.post('/login', loginUser);
 
-// router.post('/register', (req, res) => {
-//   const { username, password } = req.body;
-//   res.json({ message: `User ${username} registered successfully!` });
-// });
+router.post('/register', async(req, res) => {
+  const { name, email, password, role } = req.body;
+  console.log('HITT REGG');
+  try{
+    //Hash the password using bcrypt
+    const hashedPassword = await bcrypt.hash(password, 10); //10 is the salt rounds
 
-router.post('/register', registerUser);
+    //Insert the new user into the database
+    const result = await pool.query(
+      'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role',
+      [name, email, hashedPassword, role]
+    );
+    res.json({ message: `User ${username} registered successfully!` });
+  }catch(error){
+    console.error('Error creating user:', error);
+    throw new Error('Error creating user');
+  }
+});
+
+// router.post('/register', registerUser);
 
 console.log('✅ authRoutes file loaded:', __filename);
 console.log(router.stack.map(layer => layer.route?.path || 'Middleware'));

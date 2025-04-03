@@ -43,7 +43,7 @@ const App = () => {
     }
   }, []);
 
-  
+
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -55,7 +55,12 @@ const App = () => {
       <div>
         <nav>
           {authToken ? (
-            <button onClick={logout}>Logout</button>
+            <>
+              <button onClick={logout}>Logout</button>
+              <a href="/register">Register</a>
+              <a href="/dashboard">Dashboard</a>
+            </>
+
           ) : (
             <>
               <a href="/login">Login</a>

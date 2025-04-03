@@ -5,16 +5,16 @@ const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('')
 
   const handleSubmit = async (e) => {
+    console.log('HITENDREG');
     e.preventDefault();
     try {
       const response = await api.post('/auth/register', {
         name,
         email,
         password,
-        role, //Set role as supplier
+        role:'supplier',
       });
       console.log('Registration successful:', response.data);
     } catch (error) {
@@ -43,13 +43,6 @@ const Register = () => {
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-      <input
-        type="role"
-        placeholder="Role"
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
         required
       />
       <button type="submit">Register</button>

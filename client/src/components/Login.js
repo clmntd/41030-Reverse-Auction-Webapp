@@ -14,6 +14,7 @@ const Login = ({ setUser }) => {
       //Fix and make setUser
       localStorage.setItem('user', JSON.stringify(response.data.user));
       localStorage.setItem('role', JSON.stringify(response.data.role));
+    
       //setUser(response.data); //Set user data
       //setuser sets role of the 
       //Redirect or navigate to the dashboard
