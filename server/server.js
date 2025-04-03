@@ -9,11 +9,11 @@ const transactionRoutes = require('./routes/transactionRoutes');
 
 const app = express();
 
-// Middleware
+//Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// Register Routes with a Base Path
+//Register Routes with a Base Path
 app.use('/api/auth', authRoutes);
 app.use('/api/auctions', auctionRoutes);
 app.use('/api/bids', bidRoutes);
@@ -30,8 +30,8 @@ console.log("Routes registered successfully!");
 
 //Route Debugging (Ensure All Routes Are Logged)
 console.log("Registered Routes:");
-if (app._router && app._router.stack) {
-    app._router.stack.forEach((middleware) => {
+if (app.router && app.router.stack) {
+    app.router.stack.forEach((middleware) => {
         if (middleware.route) {
             //Directly registered route
             console.log(`🔹 ${Object.keys(middleware.route.methods).join(", ").toUpperCase()} ${middleware.route.path}`);
@@ -47,6 +47,9 @@ if (app._router && app._router.stack) {
 } else {
     console.log("❌ No routes found!");
 }
+
+// console.log(app.router);
+// console.log(app.router.stack);
 
 //Start the server
 const PORT = process.env.PORT || 5000;
