@@ -43,6 +43,8 @@ const App = () => {
     }
   }, []);
 
+  
+
   const logout = () => {
     localStorage.removeItem('token');
     setAuthToken(null);
@@ -69,6 +71,14 @@ const App = () => {
           <Route path="/dashboard" element={authToken ? <Dashboard /> : <Navigate to="/login" />} />
           <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
+
+        {/* <Routes>
+          <Route path="/login" element={<Navigate to="/auctions" /> } />
+          <Route path="/register" element={<Register />} />
+          <Route path="/auctions" element={<Auctions />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={<Navigate to="/login" />} />
+        </Routes> */}
       </div>
     </Router>
   );

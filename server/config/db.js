@@ -8,7 +8,8 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
 });
-console.log(process.env.DB_PASSWORD);
+console.log('Password:',process.env.DB_PASSWORD);
+console.log('JWT_SECRET:', process.env.JWT_SECRET);
 pool.connect()
   .then(() => console.log('✅ Database connected successfully'))
   .catch(err => console.error('❌ Database connection error:', err.message));
