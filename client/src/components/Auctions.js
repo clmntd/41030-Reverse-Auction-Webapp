@@ -14,7 +14,7 @@ const Auctions = () => {
     const fetchAuctions = async () => {
       try {
         const response = await api.get('/auctions');
-        setAuctions(response.data);
+        setAuctions(response.response.data);
       } catch (err) {
         console.error('Error fetching auctions:', err);
       }

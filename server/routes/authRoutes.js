@@ -41,15 +41,19 @@ router.use((req, res, next) => {
   next();
 });
 
-router.post('/login', (req, res) => {
-  const { username, password } = req.body;
-  res.json({ message: `Login attempt for ${username}` });
-});
+// router.post('/login', (req, res) => {
+//   const { username, password } = req.body;
+//   res.json({ message: `Login attempt for ${username}` });
+// });
 
-router.post('/register', (req, res) => {
-  const { username, password } = req.body;
-  res.json({ message: `User ${username} registered successfully!` });
-});
+router.post('/login', loginUser);
+
+// router.post('/register', (req, res) => {
+//   const { username, password } = req.body;
+//   res.json({ message: `User ${username} registered successfully!` });
+// });
+
+router.post('/register', registerUser);
 
 console.log("✅ authRoutes file loaded:", __filename);
 console.log(router.stack.map(layer => layer.route?.path || "Middleware"));
