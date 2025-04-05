@@ -6,9 +6,26 @@ router.get('/test', (req, res) => {
     res.json({ message: "Transaction route is working!" });
 });
 
-//Get all transactions
-router.get('/', (req, res) => {
-    res.json({ transactions: [] }); //Replace with actual transaction retrieval
+router.get('/', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM transactions');
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error getting transaction:', error);
+        res.status(500).json({ error: 'Error getting transaction' });
+    }
+});
+
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('SELECT * FROM transactions WHERE id = $1', [id]);
+        console.log('TRANSRESULT', result.rows);
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error getting transaction:', error);
+        res.status(500).json({ error: 'Error getting transaction' });
+    }
 });
 
 //Create a transaction (Dummy)
