@@ -10,12 +10,16 @@ socket.on('connect', () => {
   socket.emit('message', 'Hello, Server!');
 });
 
+
+
 const Auctions = () => {
   const [auctions, setAuctions] = useState([]);
   const [price, setPrice] = useState('');
   const [quality, setQuality] = useState(3);
   const [auctionBids, setAuctionBids] = useState({}); // Object to hold bids per auction
-
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user'));
+  const role = JSON.parse(localStorage.getItem('role'));
   useEffect(() => {
     console.log('useeffect');
 
@@ -42,7 +46,7 @@ const Auctions = () => {
 
       setAuctionBids((prevBids) => {
         //Update bids for the specific auction
-      
+
         console.log('setauctionbidcaALLLALLAL');
         console.log(prevBids);
         const updatedBids = { ...prevBids };
@@ -53,7 +57,7 @@ const Auctions = () => {
         return updatedBids;
       });
 
-      console.log('asdasdas',auctionBids);
+      console.log('asdasdas', auctionBids);
     });
 
     return () => {
@@ -62,9 +66,7 @@ const Auctions = () => {
   }, []);
 
   const placeBid = async (auctionId) => {
-    const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user'));
-    const role = JSON.parse(localStorage.getItem('role'));
+
     console.log(role);
 
     if (role === 'supplier') {
@@ -98,14 +100,30 @@ const Auctions = () => {
       {auctions.map((auction) => (
         <div key={auction.id}>
           <h3>Auction {auction.id}</h3>
-          <button onClick={() => placeBid(auction.id)}>Place Bid</button>
+          {role === 'facilitator' ? (
+                  <></>
+                ) : (
+                  <>
+                    <button onClick={() => placeBid(auction.id)}>Place Bid</button>
+                  </>
+                )
+                }
 
           {/* Display current bids for each auction */}
           <h4>Current Bids</h4>
           <ul>
             {auctionBids[auction.id]?.map((bid, index) => (
               <li key={index}>
-                Price: {bid.price}, Quality: {bid.quality}, Id: {bid.supplierId}
+                {role === 'facilitator' ? (
+                  <button>
+                    Price: {bid.price}, Quality: {bid.quality}, Id: {bid.supplierId}
+                  </button>
+                ) : (
+                  <>
+                    Price: {bid.price}, Quality: {bid.quality}, Id: {bid.supplierId}
+                  </>
+                )
+                }
               </li>
             ))}
           </ul>
