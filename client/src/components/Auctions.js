@@ -30,7 +30,7 @@ const Auctions = () => {
         const response2 = await api.get('/transactions');
         console.log('winning!!!', response2.data);
         setWinningBids(response2.data);
-        console.log('WINNINNG',winningBids);
+        console.log('WINNINNG', winningBids);
         console.log(response.data.auctions);
         setAuctions(response.data.auctions);
       } catch (err) {
@@ -104,9 +104,15 @@ const Auctions = () => {
 
   }
 
-  const isWinningBid = (auctionId) => {
-    return winningBids.hasOwnProperty(auctionId) && winningBids[auctionId].length > 0;
-  };
+  const whoWins = (auctionId) => {
+    const winningBid = winningBids.find(bid => bid.auction_id === auctionId);
+
+    if (winningBid) {
+      return winningBid.name;
+    } else {
+      return null;
+    }
+  }
 
 
   return (
@@ -117,11 +123,11 @@ const Auctions = () => {
           <h3>Auction {auction.id}</h3>
           {winningBids.some(x => x.auction_id === auction.id) ? (
             <>
-              Winning Bid
+              Winning Bid by {whoWins(auction.id)}
             </>
           ) : (
             <>
-               No Winning Bid
+              No Winning Bid
             </>
           )
           }
