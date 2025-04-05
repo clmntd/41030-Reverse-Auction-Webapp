@@ -66,24 +66,24 @@ const Auctions = () => {
   }, []);
 
   const placeBid = async (auctionId) => {
-
     console.log(role);
-
     if (role === 'supplier') {
       const supplierId = user.id;
-      console.log('supplierID from Auctions.js: ', supplierId);
       const bidData = { auctionId, price, quality, supplierId };
 
+      console.log('supplierID from Auctions.js: ', supplierId);
       if (quality > 5) {
         console.error('Error placing bid over 5 quality');
         return;
       }
 
       try {
-        await api.post('/bids/place', bidData, {
+        const result = await api.post('/bids/place', bidData, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
+        console.log(result);
+        bidData.id = result.data.bidId;
+        console.log(bidData.id + 'biddata id');
         //Emit the bid data to the server for real-time updates
         socket.emit('placeBid', bidData);
       } catch (err) {
@@ -93,6 +93,11 @@ const Auctions = () => {
       console.error('Error placing bid');
     }
   };
+
+  const winningBid = async () => {
+
+  }
+
 
   return (
     <div>
@@ -115,7 +120,7 @@ const Auctions = () => {
             {auctionBids[auction.id]?.map((bid, index) => (
               <li key={index}>
                 {role === 'facilitator' ? (
-                  <button>
+                  <button onClick={() => winningBid(bid.id)}>
                     Price: {bid.price}, Quality: {bid.quality}, Id: {bid.supplierId}
                   </button>
                 ) : (
