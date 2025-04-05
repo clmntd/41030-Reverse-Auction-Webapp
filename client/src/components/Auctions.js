@@ -104,12 +104,21 @@ const Auctions = () => {
 
   }
 
-  const whoWins = (auctionId) => {
+  const winWho = (auctionId) => {
     const winningBid = winningBids.find(bid => bid.auction_id === auctionId);
 
     if (winningBid) {
       return winningBid.name;
     } else {
+      return null;
+    }
+  }
+
+  const winPrice = (auctionId)=>{
+    const winningBid = winningBids.find(bid => bid.auction_id === auctionId);
+    if(winningBid){
+      return winningBid.final_price;
+    }else{
       return null;
     }
   }
@@ -123,7 +132,7 @@ const Auctions = () => {
           <h3>Auction {auction.id}</h3>
           {winningBids.some(x => x.auction_id === auction.id) ? (
             <>
-              Winning Bid by {whoWins(auction.id)}
+              Winning Bid of ${winPrice(auction.id)} by {winWho(auction.id)}
             </>
           ) : (
             <>
