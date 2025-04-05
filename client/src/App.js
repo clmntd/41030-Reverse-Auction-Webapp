@@ -34,7 +34,7 @@ import Dashboard from './components/Dashboard';
 
 const App = () => {
   const [authToken, setAuthToken] = useState(localStorage.getItem('token'));
-
+  const role = JSON.parse(localStorage.getItem('role'));
   useEffect(() => {
     // Ensure token is set on initial load
     const token = localStorage.getItem('token');
@@ -56,9 +56,21 @@ const App = () => {
         <nav>
           {authToken ? (
             <>
-              <button onClick={logout}>Logout</button>
-              <a href="/register">Register</a>
-              <a href="/dashboard">Dashboard</a>
+              {role === 'facilitator' ? (
+                <>
+                  <button onClick={logout}>Logout</button>
+                  <a href="/register">Register</a>
+                  <a href="/dashboard">Dashboard</a>
+                  <a href="/auctions">Auctions</a>
+                </>
+              ) : (
+                <>
+                  <button onClick={logout}>Logout</button>
+                  <a href="/dashboard">Dashboard</a>
+                  <a href="/auctions">Auctions</a>
+                </>
+              )
+              }
             </>
 
           ) : (
