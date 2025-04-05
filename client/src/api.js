@@ -19,6 +19,7 @@ export const registerSupplier = async (userData) => {
 };
 
 export const loginUser = async (credentials) => {
+  console.log('api call');
   return api.post("/auth/login", credentials);
 };
 

@@ -9,12 +9,13 @@ const Auctions = () => {
   const [price, setPrice] = useState('');
   const [quality, setQuality] = useState(3);
   const [currentBids, setCurrentBids] = useState([]);
-  const role = JSON.parse(localStorage.getItem('role'));
+  // const role = JSON.parse(localStorage.getItem('role'));
   useEffect(() => {
     const fetchAuctions = async () => {
       try {
         const response = await api.get('/auctions');
-        setAuctions(response.response.data);
+        console.log('response');
+        setAuctions(response.data.auctions);
       } catch (err) {
         console.error('Error fetching auctions:', err);
       }
@@ -33,17 +34,28 @@ const Auctions = () => {
 
   const placeBid = async (auctionId) => {
     const token = localStorage.getItem('token');
-    const bidData = { auction_id: auctionId, price, quality };
-
-    try {
-      await api.post('/bids/place', bidData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      //Emit the bid data to the server for real-time updates
-      socket.emit('placeBid', bidData);
-    } catch (err) {
-      console.error('Error placing bid:', err);
+    const user = JSON.parse(localStorage.getItem('user'));
+    const role = JSON.parse(localStorage.getItem('role'));
+    console.log(role);
+    if(role === 'supplier') {
+      const supplierId = user.id;
+      console.log(supplierId);
+      const bidData = { auctionId, price, quality, supplierId};
+      
+      if(quality >5)
+        console.error('Error placing bid over 5 quality');
+      try {
+        await api.post('/bids/place', bidData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        //Emit the bid data to the server for real-time updates
+        socket.emit('placeBid', bidData);
+      } catch (err) {
+        console.error('Error placing bid:', err);
+      }
+    }else{
+      console.error('Error placing bid2');
     }
   };
 

@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const pool = require('../config/db');
 const { createAuction } = require('../controllers/auctionController');
 
 router.post('/create', createAuction);
@@ -10,8 +11,10 @@ router.get('/test', (req, res) => {
 });
 
 //Get all auctions
-router.get('/', (req, res) => {
-    res.json({ auctions: [] }); //Replace with actual auction retrieval logic
+router.get('/', async (req, res) => {
+    const auctions = await pool.query('SELECT * FROM public.auctions');
+    console.log(auctions);
+    return res.json({ auctions: auctions.rows }); //Replace with actual auction retrieval logic
 });
 
 //Create a new auction
