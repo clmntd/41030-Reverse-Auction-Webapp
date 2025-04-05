@@ -16,6 +16,18 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get('/id/:id', async (req, res) => {
+    const{id}=req.params;
+    try {
+        const result = await pool.query('select * from transactions inner join users on users.id = transactions.winner_id where users.id = $1',[id]);
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error getting transactions:', error);
+        res.status(500).json({ error: 'Error getting transactions' });
+    }
+});
+
+
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
     try {

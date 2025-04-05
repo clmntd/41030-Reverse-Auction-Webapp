@@ -8,7 +8,7 @@ const Dashboard = ({ user }) => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await api.get(`/transactions/${user.id}`);
+        const response = await api.get(`/transactions/id/${user.id}`);
         setTransactions(response.data);
       } catch (err) {
         console.error('Error fetching transactions:', err);
@@ -17,7 +17,7 @@ const Dashboard = ({ user }) => {
     if (user) {
       fetchTransactions();
     }
-  }, [user]);
+  }, []);
 
   return (
     <div>

@@ -15,7 +15,7 @@ socket.on('connect', () => {
 const Auctions = () => {
   const [auctions, setAuctions] = useState([]);
   const [price, setPrice] = useState('');
-  const [quality, setQuality] = useState(3);
+  const [quality, setQuality] = useState();
   const [winningBids, setWinningBids] = useState([]);
   const [auctionBids, setAuctionBids] = useState({});
   const token = localStorage.getItem('token');
