@@ -13,7 +13,6 @@ router.get('/test', (req, res) => {
 //Get all auctions
 router.get('/', async (req, res) => {
     const auctions = await pool.query('SELECT * FROM public.auctions');
-    console.log(auctions);
     return res.json({ auctions: auctions.rows }); //Replace with actual auction retrieval logic
 });
 

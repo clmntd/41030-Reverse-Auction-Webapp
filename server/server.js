@@ -9,6 +9,11 @@ const transactionRoutes = require('./routes/transactionRoutes');
 
 const app = express();
 
+const http = require('http');
+const socketIo = require('socket.io');
+const server = http.createServer(app);
+const io = socketIo(server);
+
 //Middleware
 app.use(cors());
 app.use(bodyParser.json());
@@ -47,6 +52,21 @@ if (app.router && app.router.stack) {
 } else {
     console.log('❌ No routes found!');
 }
+
+io.on('connection', (socket) => {
+    console.log('A user connected');
+    
+    // Receive messages from the client
+    socket.on('message', (msg) => {
+      console.log('Received message:', msg);
+      socket.emit('message', 'Hello, Client!');  // Send response to the client
+    });
+  
+    // Handle disconnection
+    socket.on('disconnect', () => {
+      console.log('A user disconnected');
+    });
+  });
 
 // console.log(app.router);
 // console.log(app.router.stack);

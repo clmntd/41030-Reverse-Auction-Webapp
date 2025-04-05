@@ -3,6 +3,13 @@ import { io } from 'socket.io-client';
 import api from '../api';
 
 const socket = io('http://localhost:5000'); //Server URL
+socket.on('connect', () => {
+  console.log('Connected to the server!');
+  
+  // Send a message to the server
+  socket.emit('message', 'Hello, Server!');
+});
+
 
 const Auctions = () => {
   const [auctions, setAuctions] = useState([]);
@@ -24,6 +31,7 @@ const Auctions = () => {
 
     //Listen for real-time bid updates
     socket.on('newBid', (bidData) => {
+      console.log('SOCKETBID CALL NOW');
       setCurrentBids((prevBids) => [...prevBids, bidData]);
     });
 
@@ -42,8 +50,11 @@ const Auctions = () => {
       console.log(supplierId);
       const bidData = { auctionId, price, quality, supplierId};
       
-      if(quality >5)
+      if(quality > 5){
         console.error('Error placing bid over 5 quality');
+        return;
+      }
+
       try {
         await api.post('/bids/place', bidData, {
           headers: { Authorization: `Bearer ${token}` },
@@ -54,6 +65,7 @@ const Auctions = () => {
       } catch (err) {
         console.error('Error placing bid:', err);
       }
+
     }else{
       console.error('Error placing bid2');
     }
