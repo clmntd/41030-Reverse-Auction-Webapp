@@ -127,22 +127,23 @@ const Auctions = () => {
             </>
           ) : (
             <>
-              No Winning Bid
+              <h4>Current Bids</h4>
+              {role === 'facilitator' ? (
+                <></>
+              ) : (
+                <>
+                  <button onClick={() => placeBid(auction.id)}>Bid</button>
+                </>
+              )
+              }
             </>
           )
           }
 
-          {role === 'facilitator' ? (
-            <></>
-          ) : (
-            <>
-              <button onClick={() => placeBid(auction.id)}>No Winning Bid</button>
-            </>
-          )
-          }
+
 
           {/* Display current bids for each auction */}
-          <h4>Current Bids</h4>
+
           <ul>
             {auctionBids[auction.id]?.map((bid, index) => (
               <li key={index}>
