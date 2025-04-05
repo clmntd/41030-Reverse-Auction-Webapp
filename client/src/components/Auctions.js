@@ -16,7 +16,8 @@ const Auctions = () => {
   const [auctions, setAuctions] = useState([]);
   const [price, setPrice] = useState('');
   const [quality, setQuality] = useState(3);
-  const [auctionBids, setAuctionBids] = useState({}); // Object to hold bids per auction
+  const [winningBids, setWinningBids] = useState([]);
+  const [auctionBids, setAuctionBids] = useState({});
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user'));
   const role = JSON.parse(localStorage.getItem('role'));
@@ -26,6 +27,10 @@ const Auctions = () => {
     const fetchAuctions = async () => {
       try {
         const response = await api.get('/auctions');
+        const response2 = await api.get('/transactions');
+        console.log('winning!!!', response2.data);
+        setWinningBids(response2.data);
+        console.log('WINNINNG',winningBids);
         console.log(response.data.auctions);
         setAuctions(response.data.auctions);
       } catch (err) {
@@ -35,18 +40,12 @@ const Auctions = () => {
 
     fetchAuctions();
 
-    //Listen for real-time bid updates and update the respective auction's bids
-
-    console.log('setting socket.on:newbid');
-
     socket.on('newBid', (bidData) => {
       console.log('SOCKETBID CALL NOW');
 
       console.log(bidData);
 
       setAuctionBids((prevBids) => {
-        //Update bids for the specific auction
-
         console.log('setauctionbidcaALLLALLAL');
         console.log(prevBids);
         const updatedBids = { ...prevBids };
@@ -80,7 +79,7 @@ const Auctions = () => {
       try {
         const result = await api.post('/bids/place', bidData, {
           headers: { Authorization: `Bearer ${token}` },
-          
+
         });
         console.log(result);
         bidData.id = result.data.bidId;
@@ -105,6 +104,10 @@ const Auctions = () => {
 
   }
 
+  const isWinningBid = (auctionId) => {
+    return winningBids.hasOwnProperty(auctionId) && winningBids[auctionId].length > 0;
+  };
+
 
   return (
     <div>
@@ -112,11 +115,22 @@ const Auctions = () => {
       {auctions.map((auction) => (
         <div key={auction.id}>
           <h3>Auction {auction.id}</h3>
+          {winningBids.some(x => x.auction_id === auction.id) ? (
+            <>
+              Winning Bid
+            </>
+          ) : (
+            <>
+               No Winning Bid
+            </>
+          )
+          }
+
           {role === 'facilitator' ? (
             <></>
           ) : (
             <>
-              <button onClick={() => placeBid(auction.id)}>Place Bid</button>
+              <button onClick={() => placeBid(auction.id)}>No Winning Bid</button>
             </>
           )
           }
