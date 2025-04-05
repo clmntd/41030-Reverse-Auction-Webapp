@@ -63,7 +63,7 @@ const Auctions = () => {
     return () => {
       socket.off('newBid');
     };
-  }, []);
+  }, [auctionBids]);
 
   const placeBid = async (auctionId) => {
     console.log(role);
@@ -80,6 +80,7 @@ const Auctions = () => {
       try {
         const result = await api.post('/bids/place', bidData, {
           headers: { Authorization: `Bearer ${token}` },
+          
         });
         console.log(result);
         bidData.id = result.data.bidId;
@@ -94,7 +95,13 @@ const Auctions = () => {
     }
   };
 
-  const winningBid = async () => {
+  const winningBid = async (bidId) => {
+    console.log('bigid:' + bidId);
+    try {
+      const response = await api.post('/transactions', { bidId });
+    } catch (err) {
+      console.error('Error winning bid');
+    }
 
   }
 
@@ -106,13 +113,13 @@ const Auctions = () => {
         <div key={auction.id}>
           <h3>Auction {auction.id}</h3>
           {role === 'facilitator' ? (
-                  <></>
-                ) : (
-                  <>
-                    <button onClick={() => placeBid(auction.id)}>Place Bid</button>
-                  </>
-                )
-                }
+            <></>
+          ) : (
+            <>
+              <button onClick={() => placeBid(auction.id)}>Place Bid</button>
+            </>
+          )
+          }
 
           {/* Display current bids for each auction */}
           <h4>Current Bids</h4>
@@ -136,18 +143,25 @@ const Auctions = () => {
       ))}
 
       <div>
-        <input
-          type="number"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          placeholder="Price"
-        />
-        <input
-          type="number"
-          value={quality}
-          onChange={(e) => setQuality(e.target.value)}
-          placeholder="Quality"
-        />
+        {role === 'facilitator' ? (
+          <></>
+        ) : (
+          <>
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="Price"
+            />
+            <input
+              type="number"
+              value={quality}
+              onChange={(e) => setQuality(e.target.value)}
+              placeholder="Quality"
+            />
+          </>
+        )
+        }
       </div>
     </div>
   );
