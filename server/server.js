@@ -9,11 +9,6 @@ const transactionRoutes = require('./routes/transactionRoutes');
 
 const app = express();
 
-const http = require('http');
-const socketIo = require('socket.io');
-const server = http.createServer(app);
-const io = socketIo(server);
-
 //Middleware
 app.use(cors());
 app.use(bodyParser.json());
@@ -53,26 +48,48 @@ if (app.router && app.router.stack) {
     console.log('❌ No routes found!');
 }
 
-io.on('connection', (socket) => {
-    console.log('A user connected');
-    
-    // Receive messages from the client
-    socket.on('message', (msg) => {
-      console.log('Received message:', msg);
-      socket.emit('message', 'Hello, Client!');  // Send response to the client
-    });
-  
-    // Handle disconnection
-    socket.on('disconnect', () => {
-      console.log('A user disconnected');
-    });
-  });
 
 // console.log(app.router);
 // console.log(app.router.stack);
 
 //Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
+});
+
+const io = require('socket.io')(server, {
+    cors: {
+        origin: 'http://localhost:3000', // your frontend origin
+        methods: ['GET', 'POST']
+    }
+});
+
+io.on('connection', (socket) => {
+    console.log('A user connected');
+    
+    // Receive messages from the client
+    socket.on('message', (msg) => {
+        console.log('Received message:', msg);
+        
+        // Send a response only to the specific client (current behavior)
+        
+        // Broadcast message to all connected clients
+        io.emit('message', 'Hello, All Clients!');
+    });
+
+    socket.on('placeBid', bidData => {
+        console.log('Bid data:', bidData);
+        
+        // Send the bid data only to the client that placed the bid
+        // socket.emit('newBid', bidData);
+        
+        // Broadcast the bid data to all connected clients
+        io.emit('newBid', bidData); // This sends the bid data to everyone
+    });
+
+    // Handle disconnection
+    socket.on('disconnect', () => {
+        console.log('A user disconnected');
+    });
 });
