@@ -9,8 +9,36 @@ router.get('/test', (req, res) => {
 
 //Get all bids
 router.get('/', async (req, res) => {
-    const bids = await pool.query('SELECT bids.id as bid_id, auction_id, price, quality, users.name as name FROM public.bids inner join users on users.id = bids.supplier_id ORDER BY auction_id ASC');
+    const bids = await pool.query(
+        'SELECT bids.id as bid_id, auction_id, price, quality, users.name as name FROM public.bids inner join users on users.id = bids.supplier_id ORDER BY auction_id ASC');
     return res.json({ bids: bids.rows });
+});
+
+// Get all bids where there are no winners (no transaction)
+router.get('/no-winner', async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT bids.id as bid_id, bids.auction_id, bids.price, bids.quality, users.name as supplier_name FROM bids INNER JOIN users ON users.id = bids.supplier_id LEFT JOIN transactions ON transactions.auction_id = bids.auction_id WHERE transactions.auction_id IS NULL ORDER BY bids.auction_id ASC`
+        );
+        return res.json({ bids: result.rows });
+    } catch (error) {
+        console.error('Error fetching bids with no winners:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+//Get all bids for an auction
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const bids = await pool.query(
+            'SELECT bids.id as bid_id, auction_id, price, quality, users.name as name FROM public.bids inner join users on users.id = bids.supplier_id where auction_id = $1 ORDER BY auction_id ASC', [id]);
+        return res.json({ bids: bids.rows });
+    } catch (error) {
+        console.error('Error fetching bids:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
 //Place a bid

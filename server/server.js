@@ -99,7 +99,7 @@ io.on('connection', (socket) => {
     socket.on('makeAuction', () => {
         io.emit('makeAuction');
     });
-
+    
     // Handle disconnection
     socket.on('disconnect', () => {
         console.log('A user disconnected');
