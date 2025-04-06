@@ -45,15 +45,14 @@ const Auctions = () => {
       });
     });
 
-    // socket.on('winningBid', async () => {
-    //   try {
-
-    //     const response2 = await api.get('/transactions');
-    //     setWinningBids(response2.data);
-    //   } catch (error) {
-    //     console.error('Error fetching auctions:', error);
-    //   }
-    // });
+    socket.on('winningBid', async () => {
+      try {
+        const response2 = await api.get('/transactions');
+        setWinningBids(response2.data);
+      } catch (error) {
+        console.error('Error fetching auctions:', error);
+      }
+    });
 
 
     return () => {
@@ -104,7 +103,7 @@ const Auctions = () => {
   const winningBid = async (bidId) => {
     try {
       const response = await api.post('/transactions', { bidId });
-      socket.emit('winningBid', response);
+      socket.emit('winningBid');
     } catch (err) {
       console.error('Error winning bid');
     }

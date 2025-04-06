@@ -32,7 +32,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const result = await pool.query('select * from transactions where id = $1', [id]);
-        console.log('TRANSRESULT', result.rows);
+        console.log('transactionroute get:', result.rows);
         res.json(result.rows);
     } catch (error) {
         console.error('Error getting transaction:', error);

@@ -67,29 +67,28 @@ const io = require('socket.io')(server, {
 
 io.on('connection', (socket) => {
     console.log('A user connected');
-    
+
     // Receive messages from the client
     socket.on('message', (msg) => {
         console.log('Received message:', msg);
-        
+
         // Send a response only to the specific client (current behavior)
-        
+
         // Broadcast message to all connected clients
         io.emit('message', 'Hello, All Clients!');
     });
 
     socket.on('placeBid', bidData => {
         console.log('Bid data:', bidData);
-        
+
         // Send the bid data only to the client that placed the bid
         // socket.emit('newBid', bidData);
-        
+
         // Broadcast the bid data to all connected clients
         io.emit('newBid', bidData); // This sends the bid data to everyone
     });
 
-    socket.on('winningBid', bidData=>{
-        
+    socket.on('winningBid', () => {
         io.emit('winningBid');
     });
 

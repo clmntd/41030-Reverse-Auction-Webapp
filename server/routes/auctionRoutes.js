@@ -17,9 +17,35 @@ router.get('/', async (req, res) => {
 });
 
 //Create a new auction
-router.post('/', (req, res) => {
-    const { name, startTime, endTime } = req.body;
-    res.json({ message: `Auction "${name}" created!` });
+router.post('/', async (req, res) => {
+    const { name, facilitator_id } = req.body;
+    try {
+        const result = await pool.query(
+            'insert into auctions (facilitator_id, status) values ($1, $2)',
+            [facilitator_id, 'open']
+        );
+        res.json({ message: `Auction created!` });
+        console.log('Auction created:', result.rows[0]);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error creating auction:', err);
+    }
+});
+
+router.delete('/:id', async (req, res) => {
+    const { id } = req.params;
+    const auction = await pool.query('select * from auctions WHERE id = $1', [id]);
+    if (auction.rows.length === 0) {
+        return res.status(400).json({ message: 'Auction not found' });
+    }
+    try {
+        const response = await pool.query('delete from public.auctions where id = $1;', [id]);
+        console.log('auctionroutes delete');
+        res.json('Deleted auction: ' + id);
+    } catch (err) {
+        console.error('Error deleting auctions:', err);
+        res.status(500).json({ error: 'Error deleting auction' });
+    }
 });
 
 console.log("✅ auctionRoutes file loaded:", __filename);
