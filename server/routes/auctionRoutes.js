@@ -3,9 +3,6 @@ const router = express.Router();
 const pool = require('../config/db');
 const { createAuction } = require('../controllers/auctionController');
 
-router.post('/create', createAuction);
-//Add routes for listing, updating auction status, etc.
-
 router.get('/test', (req, res) => {
     res.json({ message: "Auction route is working!" });
 });
@@ -32,7 +29,16 @@ router.post('/', async (req, res) => {
     }
 });
 
+//Delete an auction
 router.delete('/:id', async (req, res) => {
+    const { userId } = req.body;
+    const user = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+    if (user.rows.length === 0) {
+        return res.status(400).json({ message: 'User not found' });
+    }
+    if(user.rows[0].role === 'supplier'){
+        return res.status(400).json({ message: 'User is not a facilitator' });
+    }
     const { id } = req.params;
     const auction = await pool.query('select * from auctions WHERE id = $1', [id]);
     if (auction.rows.length === 0) {
