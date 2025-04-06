@@ -39,10 +39,10 @@ const BidHistory = () => {
         };
 
         fetchBids();
-    }, [user]);  // Re-run if `user` changes
+    }, [user]);
 
     if (!user) {
-        return <h2>Loading...</h2>;  // Show loading until user is set
+        return <h2>Loading...</h2>;
     }
 
     return (

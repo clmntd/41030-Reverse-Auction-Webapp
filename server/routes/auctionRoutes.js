@@ -17,12 +17,12 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
 
-    const auctions = await pool.query('select bids.id as bid_id, auction_id, price, quality, facilitator_id, supplier_id, users.name as name from bids inner join auctions on bids.auction_id = auctions.id inner join users on users.id = bids.supplier_id ORDER BY auction_id ASC ');
-    console.log(auctions.rows);
-    if(auctions.rows.some(x => x.supplier_id == id)){
+    const auctions = await pool.query('select auction_id, bids.id as bid_id,  price, quality, facilitator_id, supplier_id, users.name as name from auctions inner join bids on bids.auction_id = auctions.id inner join users on users.id = bids.supplier_id ORDER BY auction_id ASC');
+    console.log('AUCTION', auctions.rows);
+    if (auctions.rows.some(x => x.supplier_id == id)) {
         return res.json({ auctions: auctions.rows });
-    }else{
-        return res.json({ auctions: []});
+    } else {
+        return res.json({ auctions: [] });
     }
 });
 
@@ -49,7 +49,7 @@ router.delete('/:id', async (req, res) => {
     if (user.rows.length === 0) {
         return res.status(400).json({ message: 'User not found' });
     }
-    if(user.rows[0].role === 'supplier'){
+    if (user.rows[0].role === 'supplier') {
         return res.status(400).json({ message: 'User is not a facilitator' });
     }
     const { id } = req.params;

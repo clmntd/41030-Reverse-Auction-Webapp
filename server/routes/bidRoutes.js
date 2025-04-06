@@ -9,7 +9,7 @@ router.get('/test', (req, res) => {
 
 //Get all bids
 router.get('/', async (req, res) => {
-    const bids = await pool.query('SELECT bids.id as bid_id, auction_id, price, quality, users.name as name FROM public.bids inner join users on users.id = bids.supplier_id');
+    const bids = await pool.query('SELECT bids.id as bid_id, auction_id, price, quality, users.name as name FROM public.bids inner join users on users.id = bids.supplier_id ORDER BY auction_id ASC');
     return res.json({ bids: bids.rows });
 });
 
