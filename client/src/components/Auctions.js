@@ -25,7 +25,7 @@ const Auctions = () => {
         const response = await api.get('/auctions');
         const response2 = await api.get('/transactions');
         setWinningBids(response2.data);
-  
+
         setAuctions(response.data.auctions);
       } catch (err) {
         console.error('Error fetching auctions:', err);
@@ -70,6 +70,28 @@ const Auctions = () => {
     }));
   };
 
+  const deleteAuction = async (auction_id) => {
+    if (role === 'facilitator') {
+      const userId = user.id;
+      try {
+        const result = await api.delete(`/auctions/${auction_id}`, {
+          data: { userId },
+        });
+  
+        if (result.status === 200) {
+          console.log(`Auction ${auction_id} deleted successfully.`);
+          setAuctions((prevAuctions) =>
+            prevAuctions.filter((auction) => auction.id !== auction_id)
+          );
+        }
+      } catch (err) {
+        console.error('Error deleting auction:', err);
+      }
+    } else {
+      console.error('Unauthorized to delete auction');
+    }
+  };
+  
   const placeBid = async (auctionId) => {
     if (role === 'supplier') {
       const supplierId = user.id;
@@ -128,6 +150,9 @@ const Auctions = () => {
           {winningBids.some((x) => x.auction_id === auction.id) ? (
             <>
               Winning Bid of ${winPrice(auction.id)} by {winWho(auction.id)}
+              <button onClick={() => deleteAuction(auction.id)}>
+                Delete Auction
+              </button>
             </>
           ) : (
             <>
@@ -136,9 +161,11 @@ const Auctions = () => {
                 {auctionBids[auction.id]?.map((bid, index) => (
                   <li key={index}>
                     {role === 'facilitator' ? (
-                      <button onClick={() => winningBid(bid.id)}>
-                        Price: {bid.price}, Quality: {bid.quality}, Name: {bid.name}
-                      </button>
+                      <>
+                        <button onClick={() => winningBid(bid.id)}>
+                          Price: {bid.price}, Quality: {bid.quality}, Name: {bid.name}
+                        </button>
+                      </>
                     ) : (
                       <>
                         Price: {bid.price}, Quality: {bid.quality}, Name: {bid.name}

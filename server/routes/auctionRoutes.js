@@ -47,7 +47,7 @@ router.delete('/:id', async (req, res) => {
     try {
         const response = await pool.query('delete from public.auctions where id = $1;', [id]);
         console.log('auctionroutes delete');
-        res.json('Deleted auction: ' + id);
+        return res.status(200).json({ message: `Auction ${id} deleted successfully` });
     } catch (err) {
         console.error('Error deleting auctions:', err);
         res.status(500).json({ error: 'Error deleting auction' });
