@@ -63,6 +63,15 @@ const Auctions = () => {
       }
     });
 
+    socket.on('makeAuction', async () => {
+      try {
+        const response = await api.get('/auctions');
+        setAuctions(response.data.auctions);
+      } catch (error) {
+        console.error('Error fetching auctions:', error);
+      }
+    });
+
 
     return () => {
       socket.off('newBid');
@@ -99,6 +108,25 @@ const Auctions = () => {
     } else {
       console.error('Unauthorized to delete auction');
     }
+  };
+
+  const newAuction = async () => {
+    if (role === 'facilitator') {
+      const userId = user.id;
+      try {
+        socket.emit('makeAuction');
+        const result = await api.post('/auctions/', {
+          data: { userId },
+        });
+        if (result.status === 200) {
+          console.log(`Auction created successfully.`);
+        }
+      } catch (err) {
+        console.error('Error deleting auction:', err);
+      }
+    } else {
+      console.error('Unauthorized to create auction');
+    };
   };
 
   const placeBid = async (auctionId) => {
@@ -160,9 +188,9 @@ const Auctions = () => {
             <>
               Winning Bid of ${winPrice(auction.id)} by {winWho(auction.id)}
               {role === 'facilitator' && (
-                  <button onClick={() => deleteAuction(auction.id)}>
-                    Delete Auction
-                  </button>
+                <button onClick={() => deleteAuction(auction.id)}>
+                  Delete Auction
+                </button>
               )}
             </>
           ) : (
@@ -203,17 +231,25 @@ const Auctions = () => {
                     }
                     placeholder="Quality"
                   />
-
                   <>
                     <button onClick={() => placeBid(auction.id)}>Bid</button>
                   </>
-
                 </div>
               )}
             </>
           )}
         </div>
       ))}
+      {role === 'facilitator' ? (
+        <>
+          <button onClick={() => newAuction()}>
+            Make New Auction
+          </button>
+        </>
+      ) : (
+        <>
+        </>
+      )}
     </div>
   );
 };

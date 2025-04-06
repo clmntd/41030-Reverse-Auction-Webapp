@@ -13,9 +13,16 @@ router.get('/', async (req, res) => {
     return res.json({ auctions: auctions.rows });
 });
 
+//Get all auctions data where user_id participated
+router.get('/:id', async (req, res) => {
+    const { userId } = req.body;
+    const auctions = await pool.query('select * from auctions inner join bids on bids.auction_id = auctions.id where bids.supplier_id = $1', [userId]);
+    return res.json({ auctions: auctions.rows });
+});
+
 //Create a new auction
 router.post('/', async (req, res) => {
-    const { name, facilitator_id } = req.body;
+    const { facilitator_id } = req.body;
     try {
         const result = await pool.query(
             'insert into auctions (facilitator_id, status) values ($1, $2)',
@@ -45,7 +52,8 @@ router.delete('/:id', async (req, res) => {
         return res.status(400).json({ message: 'Auction not found' });
     }
     try {
-        const response = await pool.query('delete from public.auctions where id = $1;', [id]);
+        await pool.query('delete from auctions where id = $1;', [id]);
+        await pool.query('delete from bids where auction_id = $1;', [id]);
         console.log('auctionroutes delete');
         return res.status(200).json({ message: `Auction ${id} deleted successfully` });
     } catch (err) {

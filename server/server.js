@@ -96,6 +96,10 @@ io.on('connection', (socket) => {
         io.emit('deleteAuction');
     });
 
+    socket.on('makeAuction', () => {
+        io.emit('makeAuction');
+    });
+
     // Handle disconnection
     socket.on('disconnect', () => {
         console.log('A user disconnected');
