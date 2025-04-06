@@ -54,6 +54,15 @@ const Auctions = () => {
       }
     });
 
+    socket.on('deleteAuction', async () => {
+      try {
+        const response = await api.get('/auctions');
+        setAuctions(response.data.auctions);
+      } catch (error) {
+        console.error('Error fetching auctions:', error);
+      }
+    });
+
 
     return () => {
       socket.off('newBid');
@@ -74,10 +83,10 @@ const Auctions = () => {
     if (role === 'facilitator') {
       const userId = user.id;
       try {
+        socket.emit('deleteAuction');
         const result = await api.delete(`/auctions/${auction_id}`, {
           data: { userId },
         });
-  
         if (result.status === 200) {
           console.log(`Auction ${auction_id} deleted successfully.`);
           setAuctions((prevAuctions) =>
@@ -91,7 +100,7 @@ const Auctions = () => {
       console.error('Unauthorized to delete auction');
     }
   };
-  
+
   const placeBid = async (auctionId) => {
     if (role === 'supplier') {
       const supplierId = user.id;
@@ -150,9 +159,11 @@ const Auctions = () => {
           {winningBids.some((x) => x.auction_id === auction.id) ? (
             <>
               Winning Bid of ${winPrice(auction.id)} by {winWho(auction.id)}
-              <button onClick={() => deleteAuction(auction.id)}>
-                Delete Auction
-              </button>
+              {role === 'facilitator' && (
+                  <button onClick={() => deleteAuction(auction.id)}>
+                    Delete Auction
+                  </button>
+              )}
             </>
           ) : (
             <>

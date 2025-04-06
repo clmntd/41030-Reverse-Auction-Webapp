@@ -92,8 +92,8 @@ io.on('connection', (socket) => {
         io.emit('winningBid');
     });
 
-    socket.on('deletedAuction', () => {
-        io.emit('deletedAuction');
+    socket.on('deleteAuction', () => {
+        io.emit('deleteAuction');
     });
 
     // Handle disconnection
