@@ -5,22 +5,18 @@ import api from '../api';
 const socket = io('http://localhost:5000'); // Server URL
 socket.on('connect', () => {
   console.log('Connected to the server!');
-
-  // Send a message to the server
   socket.emit('message', 'Hello, Server!');
 });
 
-
-
 const Auctions = () => {
   const [auctions, setAuctions] = useState([]);
-  const [price, setPrice] = useState('');
-  const [quality, setQuality] = useState();
+  const [auctionValues, setAuctionValues] = useState({}); // Store price and quality for each auction
   const [winningBids, setWinningBids] = useState([]);
   const [auctionBids, setAuctionBids] = useState({});
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user'));
   const role = JSON.parse(localStorage.getItem('role'));
+
   useEffect(() => {
     console.log('useeffect');
 
@@ -28,10 +24,7 @@ const Auctions = () => {
       try {
         const response = await api.get('/auctions');
         const response2 = await api.get('/transactions');
-        console.log('winning!!!', response2.data);
         setWinningBids(response2.data);
-        console.log('WINNINNG', winningBids);
-        console.log(response.data.auctions);
         setAuctions(response.data.auctions);
       } catch (err) {
         console.error('Error fetching auctions:', err);
@@ -41,13 +34,7 @@ const Auctions = () => {
     fetchAuctions();
 
     socket.on('newBid', (bidData) => {
-      console.log('SOCKETBID CALL NOW');
-
-      console.log(bidData);
-
       setAuctionBids((prevBids) => {
-        console.log('setauctionbidcaALLLALLAL');
-        console.log(prevBids);
         const updatedBids = { ...prevBids };
         if (!updatedBids[bidData.auctionId]) {
           updatedBids[bidData.auctionId] = [];
@@ -55,8 +42,6 @@ const Auctions = () => {
         updatedBids[bidData.auctionId].push(bidData);
         return updatedBids;
       });
-
-      console.log('asdasdas', auctionBids);
     });
 
     return () => {
@@ -64,14 +49,27 @@ const Auctions = () => {
     };
   }, [auctionBids]);
 
+  const handleAuctionValuesChange = (auctionId, field, value) => {
+    setAuctionValues((prevValues) => ({
+      ...prevValues,
+      [auctionId]: {
+        ...prevValues[auctionId],
+        [field]: value,
+      },
+    }));
+  };
+
   const placeBid = async (auctionId) => {
-    console.log(role);
     if (role === 'supplier') {
       const supplierId = user.id;
-      const bidData = { auctionId, price, quality, supplierId };
+      const bidData = {
+        auctionId,
+        price: auctionValues[auctionId]?.price,
+        quality: auctionValues[auctionId]?.quality,
+        supplierId,
+      };
 
-      console.log('supplierID from Auctions.js: ', supplierId);
-      if (quality > 5) {
+      if (bidData.quality > 5) {
         console.error('Error placing bid over 5 quality');
         return;
       }
@@ -79,12 +77,9 @@ const Auctions = () => {
       try {
         const result = await api.post('/bids/place', bidData, {
           headers: { Authorization: `Bearer ${token}` },
-
         });
-        console.log(result);
         bidData.id = result.data.bidId;
-        console.log(bidData.id + 'biddata id');
-        //Emit the bid data to the server for real-time updates
+        bidData.name = result.data.name;
         socket.emit('placeBid', bidData);
       } catch (err) {
         console.error('Error placing bid:', err);
@@ -95,34 +90,22 @@ const Auctions = () => {
   };
 
   const winningBid = async (bidId) => {
-    console.log('bigid:' + bidId);
     try {
       const response = await api.post('/transactions', { bidId });
     } catch (err) {
       console.error('Error winning bid');
     }
-
-  }
+  };
 
   const winWho = (auctionId) => {
-    const winningBid = winningBids.find(bid => bid.auction_id === auctionId);
+    const winningBid = winningBids.find((bid) => bid.auction_id === auctionId);
+    return winningBid ? winningBid.name : null;
+  };
 
-    if (winningBid) {
-      return winningBid.name;
-    } else {
-      return null;
-    }
-  }
-
-  const winPrice = (auctionId)=>{
-    const winningBid = winningBids.find(bid => bid.auction_id === auctionId);
-    if(winningBid){
-      return winningBid.final_price;
-    }else{
-      return null;
-    }
-  }
-
+  const winPrice = (auctionId) => {
+    const winningBid = winningBids.find((bid) => bid.auction_id === auctionId);
+    return winningBid ? winningBid.final_price : null;
+  };
 
   return (
     <div>
@@ -130,69 +113,57 @@ const Auctions = () => {
       {auctions.map((auction) => (
         <div key={auction.id}>
           <h3>Auction {auction.id}</h3>
-          {winningBids.some(x => x.auction_id === auction.id) ? (
+          {winningBids.some((x) => x.auction_id === auction.id) ? (
             <>
               Winning Bid of ${winPrice(auction.id)} by {winWho(auction.id)}
             </>
           ) : (
             <>
               <h4>Current Bids</h4>
-              {role === 'facilitator' ? (
-                <></>
-              ) : (
-                <>
-                  <button onClick={() => placeBid(auction.id)}>Bid</button>
-                </>
-              )
-              }
+              <ul>
+                {auctionBids[auction.id]?.map((bid, index) => (
+                  <li key={index}>
+                    {role === 'facilitator' ? (
+                      <button onClick={() => winningBid(bid.id)}>
+                        Price: {bid.price}, Quality: {bid.quality}, Name: {bid.name}
+                      </button>
+                    ) : (
+                      <>
+                        Price: {bid.price}, Quality: {bid.quality}, Name: {bid.name}
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              {role !== 'facilitator' && (
+                <div>
+                  <input
+                    type="number"
+                    value={auctionValues[auction.id]?.price || ''}
+                    onChange={(e) =>
+                      handleAuctionValuesChange(auction.id, 'price', e.target.value)
+                    }
+                    placeholder="Price"
+                  />
+                  <input
+                    type="number"
+                    value={auctionValues[auction.id]?.quality || ''}
+                    onChange={(e) =>
+                      handleAuctionValuesChange(auction.id, 'quality', e.target.value)
+                    }
+                    placeholder="Quality"
+                  />
+                  {role !== 'facilitator' && (
+                    <>
+                      <button onClick={() => placeBid(auction.id)}>Bid</button>
+                    </>
+                  )}
+                </div>
+              )}
             </>
-          )
-          }
-
-
-
-          {/* Display current bids for each auction */}
-
-          <ul>
-            {auctionBids[auction.id]?.map((bid, index) => (
-              <li key={index}>
-                {role === 'facilitator' ? (
-                  <button onClick={() => winningBid(bid.id)}>
-                    Price: {bid.price}, Quality: {bid.quality}, Id: {bid.supplierId}
-                  </button>
-                ) : (
-                  <>
-                    Price: {bid.price}, Quality: {bid.quality}, Id: {bid.supplierId}
-                  </>
-                )
-                }
-              </li>
-            ))}
-          </ul>
+          )}
         </div>
       ))}
-
-      <div>
-        {role === 'facilitator' ? (
-          <></>
-        ) : (
-          <>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="Price"
-            />
-            <input
-              type="number"
-              value={quality}
-              onChange={(e) => setQuality(e.target.value)}
-              placeholder="Quality"
-            />
-          </>
-        )
-        }
-      </div>
     </div>
   );
 };

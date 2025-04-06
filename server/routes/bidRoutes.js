@@ -10,8 +10,12 @@ router.get('/test', (req, res) => {
 //Place a bid
 router.post('/place', async (req, res) => {
     const { auctionId, price, quality, supplierId } = req.body;
+    const response = await pool.query(
+        'select * from users where id = $1',
+        [supplierId]
+    )
     const result = await pool.query(
-        'INSERT INTO bids (supplier_id, auction_id, price, quality) VALUES ($1, $2, $3, $4) RETURNING id',
+        'insert into bids (supplier_id, auction_id, price, quality) values ($1, $2, $3, $4) RETURNING id',
         [supplierId, auctionId, price, quality]
     );
 
@@ -19,7 +23,8 @@ router.post('/place', async (req, res) => {
     // console.log(bidId, 'bidsjfkdsdf');
     res.json({
         message: `Bid of ${price} placed for auction ${auctionId} by ${supplierId}`,
-        bidId: bidId
+        bidId: bidId,
+        name: response.rows[0].name,
     });
     console.log('RAAAAN');
 });
