@@ -63,6 +63,7 @@ const App = () => {
                   <a href="/register">Register</a>
                   <a href="/dashboard">Dashboard</a>
                   <a href="/auctions">Auctions</a>
+                  <a href='/history'>Bidding History</a>
                 </>
               ) : (
                 <>
