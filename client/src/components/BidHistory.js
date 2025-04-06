@@ -5,6 +5,8 @@ const BidHistory = () => {
     const [bids, setBids] = useState([]);
     const [user, setUser] = useState(null);
 
+    let lastAuctionId = null; // Regular variable, not part of state
+
     useEffect(() => {
         // Get the user from localStorage
         const userData = JSON.parse(localStorage.getItem('user'));
@@ -20,7 +22,7 @@ const BidHistory = () => {
             if (user.role == 'facilitator') {
                 try {
                     const response = await api.get('/bids');
-                    console.log('testeste',response.data);
+                    console.log('testeste', response.data);
                     setBids(response.data.bids);
                 } catch (err) {
                     console.error('Error fetching bids:', err);
@@ -35,7 +37,6 @@ const BidHistory = () => {
                     console.error('Error fetching bids:', err);
                 }
             }
-
         };
 
         fetchBids();
@@ -49,14 +50,21 @@ const BidHistory = () => {
         <div>
             <h2>{user ? `${user.name}'s Dashboard` : 'Loading...'}</h2>
             {bids.length > 0 ? (
-                bids.map((bid, index) => (
-                    <div key={index}>
-                        <h2>Auction ID: {bid.auction_id}</h2>
-                        <p>Bidding #: {bid.bid_id}</p>
-                        <p>Owner of Bid: {bid.name}</p>
-                        <p>Bidding Price: {bid.price}</p>
-                    </div>
-                ))
+                bids.map((bid, index) => {
+                    const shouldRenderAuctionId = bid.auction_id !== lastAuctionId;
+                    if (shouldRenderAuctionId) {
+                        lastAuctionId = bid.auction_id;
+                    }
+
+                    return (
+                        <div key={index}>
+                            {shouldRenderAuctionId && (
+                                <h2>Auction ID: {bid.auction_id}</h2>
+                            )}
+                            <p>Bid# {bid.bid_id}: ${bid.price} by {bid.name}</p>
+                        </div>
+                    );
+                })
             ) : (
                 <p>No bids found.</p>
             )}
