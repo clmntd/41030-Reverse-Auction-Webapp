@@ -25,6 +25,7 @@ const Auctions = () => {
         const response = await api.get('/auctions');
         const response2 = await api.get('/transactions');
         setWinningBids(response2.data);
+  
         setAuctions(response.data.auctions);
       } catch (err) {
         console.error('Error fetching auctions:', err);
@@ -43,6 +44,17 @@ const Auctions = () => {
         return updatedBids;
       });
     });
+
+    // socket.on('winningBid', async () => {
+    //   try {
+
+    //     const response2 = await api.get('/transactions');
+    //     setWinningBids(response2.data);
+    //   } catch (error) {
+    //     console.error('Error fetching auctions:', error);
+    //   }
+    // });
+
 
     return () => {
       socket.off('newBid');
@@ -92,6 +104,7 @@ const Auctions = () => {
   const winningBid = async (bidId) => {
     try {
       const response = await api.post('/transactions', { bidId });
+      socket.emit('winningBid', response);
     } catch (err) {
       console.error('Error winning bid');
     }
@@ -153,11 +166,11 @@ const Auctions = () => {
                     }
                     placeholder="Quality"
                   />
-                  {role !== 'facilitator' && (
-                    <>
-                      <button onClick={() => placeBid(auction.id)}>Bid</button>
-                    </>
-                  )}
+
+                  <>
+                    <button onClick={() => placeBid(auction.id)}>Bid</button>
+                  </>
+
                 </div>
               )}
             </>

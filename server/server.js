@@ -88,6 +88,11 @@ io.on('connection', (socket) => {
         io.emit('newBid', bidData); // This sends the bid data to everyone
     });
 
+    socket.on('winningBid', bidData=>{
+        
+        io.emit('winningBid');
+    });
+
     // Handle disconnection
     socket.on('disconnect', () => {
         console.log('A user disconnected');
