@@ -31,12 +31,13 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Auctions from './components/Auctions';
 import Dashboard from './components/Dashboard';
+import BidHistory from './components/BidHistory';
 
 const App = () => {
   const [authToken, setAuthToken] = useState(localStorage.getItem('token'));
   const role = JSON.parse(localStorage.getItem('role'));
   useEffect(() => {
-    // Ensure token is set on initial load
+    //Ensure token is set on initial load
     const token = localStorage.getItem('token');
     if (token) {
       setAuthToken(token);
@@ -68,6 +69,7 @@ const App = () => {
                   <button onClick={logout}>Logout</button>
                   <a href="/dashboard">Dashboard</a>
                   <a href="/auctions">Auctions</a>
+                  <a href='/history'>Bidding History</a>
                 </>
               )
               }
@@ -86,6 +88,7 @@ const App = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/auctions" element={authToken ? <Auctions /> : <Navigate to="/login" />} />
           <Route path="/dashboard" element={authToken ? <Dashboard /> : <Navigate to="/login" />} />
+          <Route path="/history" element={authToken ? <BidHistory /> : <Navigate to="/login" />} />
           <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
 
