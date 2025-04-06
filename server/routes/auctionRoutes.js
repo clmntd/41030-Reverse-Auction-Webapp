@@ -15,8 +15,10 @@ router.get('/', async (req, res) => {
 
 //Get all auctions data where user_id participated
 router.get('/:id', async (req, res) => {
-    const { userId } = req.params;
-    const auctions = await pool.query('select * from auctions inner join bids on bids.auction_id = auctions.id where bids.supplier_id = $1', [userId]);
+    const { id } = req.params;
+
+    const auctions = await pool.query('select bids.id as bid_id, auction_id, price, quality, facilitator_id, users.name as name from bids inner join auctions on bids.auction_id = auctions.id inner join users on users.id = bids.supplier_id where bids.supplier_id = $1', [id]);
+    console.log(id);
     return res.json({ auctions: auctions.rows });
 });
 

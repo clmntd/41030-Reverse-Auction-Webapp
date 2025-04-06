@@ -7,6 +7,12 @@ router.get('/test', (req, res) => {
     res.json({ message: "Bid route is working!" });
 });
 
+//Get all bids
+router.get('/', async (req, res) => {
+    const bids = await pool.query('SELECT bids.id as bid_id, auction_id, price, quality, users.name as name FROM public.bids inner join users on users.id = bids.supplier_id');
+    return res.json({ bids: bids.rows });
+});
+
 //Place a bid
 router.post('/place', async (req, res) => {
     const { auctionId, price, quality, supplierId } = req.body;

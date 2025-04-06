@@ -67,7 +67,6 @@ const App = () => {
               ) : (
                 <>
                   <button onClick={logout}>Logout</button>
-                  <a href="/dashboard">Dashboard</a>
                   <a href="/auctions">Auctions</a>
                   <a href='/history'>Bidding History</a>
                 </>
