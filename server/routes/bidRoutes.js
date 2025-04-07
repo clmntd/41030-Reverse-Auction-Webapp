@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 router.get('/no-winner', async (req, res) => {
     try {
         const result = await pool.query(
-            `SELECT bids.id as bid_id, bids.auction_id, bids.price, bids.quality, users.name as supplier_name, supplier_id FROM bids INNER JOIN users ON users.id = bids.supplier_id LEFT JOIN transactions ON transactions.auction_id = bids.auction_id WHERE transactions.auction_id IS NULL ORDER BY bids.bid_id ASC`
+            `SELECT bids.id as bid_id, bids.auction_id, bids.price, bids.quality, users.name as supplier_name, supplier_id FROM bids INNER JOIN users ON users.id = bids.supplier_id LEFT JOIN transactions ON transactions.auction_id = bids.auction_id WHERE transactions.auction_id IS NULL ORDER BY auction_id ASC, bids.id ASC`
         );
         return res.json({ bids: result.rows });
     } catch (error) {
