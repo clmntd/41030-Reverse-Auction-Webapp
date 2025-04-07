@@ -164,6 +164,7 @@ const Auctions = () => {
   const winningBid = async (bidId) => {
     try {
       const response = await api.post('/transactions', { bidId });
+      console.log('Winning Bid from auctions winning bid function: ', response);
       socket.emit('winningBid');
     } catch (err) {
       console.error('Error winning bid');
@@ -233,7 +234,7 @@ const Auctions = () => {
                 getNoBid(auction.id).length > 0 ? (
                   getNoBid(auction.id).map((bid, index) => (
                     role == 'facilitator' ? (
-                      <button key={index} onClick={() => winningBid(bid)}>
+                      <button key={index} onClick={() => winningBid(bid.bid_id)}>
                         Price: {bid.price}, Quality: {bid.quality}, Name: {bid.supplier_name}
                       </button>
 

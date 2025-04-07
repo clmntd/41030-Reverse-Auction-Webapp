@@ -18,7 +18,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
 
     const auctions = await pool.query(
-        'select auction_id, bids.id as bid_id,  price, quality, facilitator_id, supplier_id, users.name as name from auctions inner join bids on bids.auction_id = auctions.id inner join users on users.id = bids.supplier_id ORDER BY auction_id ASC');
+        'SELECT auction_id, bids.id AS bid_id, price, quality, facilitator_id, supplier_id, users.name AS name FROM auctions INNER JOIN bids ON bids.auction_id = auctions.id INNER JOIN users ON users.id = bids.supplier_id WHERE auctions.id IN (SELECT DISTINCT auction_id FROM bids WHERE supplier_id = $1) ORDER BY auction_id ASC, bids.id ASC', [id]);
     console.log('AUCTION', auctions.rows);
     if (auctions.rows.some(x => x.supplier_id == id)) {
         return res.json({ auctions: auctions.rows });
