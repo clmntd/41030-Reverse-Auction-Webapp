@@ -1,8 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import api from '../api';
+import {
+  Box,
+  Button,
+  Chip,
+  Container,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
+  Stack,
+  TextField,
+  Typography
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-const socket = io('http://localhost:5000'); // Server URL
+const socket = io('http://localhost:5000'); //Server URL
 socket.on('connect', () => {
   console.log('Connected to the server!');
   socket.emit('message', 'Hello, Server!');
@@ -209,121 +225,164 @@ const Auctions = () => {
   };
 
   return (
-    <div>
-      <h2>Active Auctions</h2>
-      {auctions.map((auction) => (
-        <div key={auction.id}>
-          <h3>Auction {auction.id}</h3>
-          {winningBids.some((x) => x.auction_id === auction.id) ? (
-            <>
-            <ul>
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: 500, color: 'text.primary' }}>
+          Active Auctions
+        </Typography>
+        {role === 'facilitator' && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={newAuction}
+            sx={{
+              borderRadius: 1,
+              textTransform: 'none',
+              px: 3,
+              py: 1
+            }}
+          >
+            New Auction
+          </Button>
+        )}
+      </Box>
 
-              Winning Bid of ${winPrice(auction.id)} by {winWho(auction.id)}
-            </ul>
-              {role === 'facilitator' && (
-                <button onClick={() => deleteAuction(auction.id)}>
-                  Delete Auction
-                </button>
-              )}
-            </>
+      {auctions.map((auction) => (
+        <Paper
+          key={auction.id}
+          sx={{
+            mb: 3,
+            p: 3,
+            borderRadius: 2,
+            border: '1px solid',
+            borderColor: 'divider'
+          }}
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 500 }}>
+              Auction #{auction.id}
+            </Typography>
+            {role === 'facilitator' && (
+              <IconButton
+                onClick={() => deleteAuction(auction.id)}
+                sx={{ color: 'error.main' }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            )}
+          </Box>
+
+          {winningBids.some((x) => x.auction_id === auction.id) ? (
+            <Paper sx={{ p: 2, bgcolor: 'success.light', borderRadius: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                🏆 Winning Bid: ${winPrice(auction.id)} by {winWho(auction.id)}
+              </Typography>
+            </Paper>
           ) : (
             <>
-              {auctionBids[auction.id]?.length > 0 ? (
+              {(auctionBids[auction.id]?.length > 0 || getNoBid(auction.id).length > 0) ? (
                 <>
-                  <h4>Current Bids</h4>
-                  <ul>
-                    {auctionBids[auction.id]?.map((bid, index) => (
-
-                      <li key={index}>
+                  <Typography variant="subtitle1" sx={{ mb: 2, color: 'text.secondary' }}>
+                    Current Bids
+                  </Typography>
+                  <List dense sx={{ mb: 2 }}>
+                    {(auctionBids[auction.id] || getNoBid(auction.id)).map((bid, index) => (
+                      <ListItem
+                        key={index}
+                        sx={{
+                          py: 1,
+                          borderBottom: '1px solid',
+                          borderColor: 'divider'
+                        }}
+                      >
                         {role === 'facilitator' ? (
-                          <>
-                            <button onClick={() => winningBid(bid.id)}>
-                              Price: ${bid.price}, Quality: {bid.quality}, Name: {bid.name}
-                            </button>
-                          </>
+                          <Button
+                            fullWidth
+                            onClick={() => winningBid(bid.id || bid.bid_id)}
+                            sx={{
+                              justifyContent: 'space-between',
+                              textTransform: 'none',
+                              borderRadius: 1
+                            }}
+                          >
+                            <Stack direction="row" spacing={1}>
+                              <span>${bid.price}</span>
+                              <Chip label={`Quality: ${bid.quality}`} size="small" />
+                              <span>{bid.name || bid.supplier_name}</span>
+                            </Stack>
+                            <Chip label="Select Winner" color="primary" size="small" />
+                          </Button>
                         ) : (
-                          <>
-                            {dash.price && `Price: $${bid.price}, `}
-                            {dash.quality && `Quality: ${bid.quality}, `}
-                            Name: {bid.name}
-                          </>
+                          <ListItemText
+                            primary={
+                              <Stack direction="row" spacing={2} alignItems="center">
+                                {dash.price && <span>${bid.price}</span>}
+                                {dash.quality && <Chip label={`Quality: ${bid.quality}`} size="small" />}
+                                <span>{bid.name || bid.supplier_name}</span>
+                              </Stack>
+                            }
+                          />
                         )}
-                      </li>
+                      </ListItem>
                     ))}
-                  </ul>
-                  {role === 'facilitator' ? (
-                    <button onClick={() => deleteAuction(auction.id)}>Delete Auction</button>
-                  ) : null}
+                  </List>
                 </>
               ) : (
-                getNoBid(auction.id).length > 0 ? (
-                  <>
-                    <h4>Current Bids</h4>
-                    <ul>
-                      {getNoBid(auction.id).map((bid, index) => (
-                        role == 'facilitator' ? (
-                          <li>
-                            <button key={index} onClick={() => winningBid(bid.bid_id)}>
-                              Price: ${bid.price}, Quality: {bid.quality}, Name: {bid.supplier_name}
-                            </button>
-                          </li>
-                        ) : (
-                          <li>
-                            <div>
-                              {dash.price && `Price: $${bid.price}, `}
-                              {dash.quality && `Quality: ${bid.quality}, `}
-                              Name: {bid.supplier_name}
-                            </div>
-                          </li>
-                        )
-                      ))}
-                    </ul>
-                    {role === 'facilitator' ? (
-                      <button onClick={() => deleteAuction(auction.id)}>Delete Auction</button>
-                    ) : null}
-                  </>
-                ) : (
-                  role == 'facilitator' ? (
-                    <>
-                      <h4>No bids have been placed yet.</h4>
-                      <button onClick={() => deleteAuction(auction.id)}>
-                        Delete Auction
-                      </button>
-                    </>
-                  ) : (
-                    <h4>No bids have been placed yet.</h4>
-                  )
-                )
+                <Paper sx={{ p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
+                  <Typography variant="body1" color="text.secondary">
+                    No bids have been placed yet
+                  </Typography>
+                </Paper>
               )}
+
               {role !== 'facilitator' && (
-                <div>
-                  <input
-                    type="number"
-                    value={auctionValues[auction.id]?.price || ''}
-                    onChange={(e) =>
-                      handleAuctionValuesChange(auction.id, 'price', e.target.value)
-                    }
-                    placeholder="Price"
-                  />
-                  <input
-                    type="number"
-                    value={auctionValues[auction.id]?.quality || ''}
-                    onChange={(e) =>
-                      handleAuctionValuesChange(auction.id, 'quality', e.target.value)
-                    }
-                    placeholder="Quality 1-5"
-                  />
-                  <button onClick={() => placeBid(auction.id)} disabled={!auctionValues[auction.id]?.price || !auctionValues[auction.id]?.quality}>Bid</button>
-                </div>
+                <Box component="form" sx={{ mt: 3 }}>
+                  <Stack direction="row" spacing={2}>
+                    <TextField
+                      type="number"
+                      label="Price"
+                      variant="outlined"
+                      size="small"
+                      fullWidth
+                      value={auctionValues[auction.id]?.price || ''}
+                      onChange={(e) =>
+                        handleAuctionValuesChange(auction.id, 'price', e.target.value)
+                      }
+                      sx={{ flex: 1 }}
+                    />
+                    <TextField
+                      type="number"
+                      label="Quality (1-5)"
+                      variant="outlined"
+                      size="small"
+                      fullWidth
+                      value={auctionValues[auction.id]?.quality || ''}
+                      onChange={(e) =>
+                        handleAuctionValuesChange(auction.id, 'quality', e.target.value)
+                      }
+                      inputProps={{ min: 1, max: 5 }}
+                      sx={{ flex: 1 }}
+                    />
+                    <Button
+                      variant="contained"
+                      onClick={() => placeBid(auction.id)}
+                      disabled={!auctionValues[auction.id]?.price || !auctionValues[auction.id]?.quality}
+                      sx={{
+                        px: 4,
+                        borderRadius: 1,
+                        textTransform: 'none'
+                      }}
+                    >
+                      Place Bid
+                    </Button>
+                  </Stack>
+                </Box>
               )}
             </>
           )}
-        </div>
+        </Paper>
       ))}
-      {role === 'facilitator' ? (
-        <button onClick={() => newAuction()}>Make New Auction</button>
-      ) : null}
-    </div>
+    </Container>
   );
 };
 

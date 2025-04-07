@@ -31,55 +31,121 @@ const Login = ({ setUser }) => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ padding: 4 }}>
-      <Paper sx={{ padding: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Typography variant="h5" gutterBottom align="center">
-          Login
+    <Container 
+    maxWidth="sm" 
+    sx={{ 
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      py: 4
+    }}
+  >
+    <Paper 
+      sx={{ 
+        padding: 4,
+        width: '100%',
+        maxWidth: 400,
+        boxShadow: 3,
+        borderRadius: 2,
+        border: '1px solid',
+        borderColor: 'divider',
+        backgroundColor: 'background.paper'
+      }}
+    >
+      <Typography 
+        variant="h4" 
+        sx={{ 
+          mb: 3,
+          fontWeight: 500,
+          textAlign: 'center',
+          color: 'text.primary'
+        }}
+      >
+        Welcome Back
+      </Typography>
+      
+      {error && (
+        <Typography 
+          variant="body2" 
+          color="error"
+          sx={{ 
+            mb: 2,
+            py: 1,
+            px: 2,
+            backgroundColor: 'error.light',
+            borderRadius: 1,
+            textAlign: 'center'
+          }}
+        >
+          {error}
         </Typography>
-        
-        {/* Error Message */}
-        {error && (
-          <Typography variant="body2" color="error" sx={{ marginBottom: 2 }}>
-            {error}
-          </Typography>
-        )}
+      )}
 
-        {/* Login Form */}
-        <Box component="form" onSubmit={handleLogin} sx={{ width: '100%' }}>
-          <TextField
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+      <Box 
+        component="form" 
+        onSubmit={handleLogin} 
+        sx={{ width: '100%' }}
+      >
+        <TextField
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          fullWidth
+          margin="normal"
+          variant="outlined"
+          sx={{ mb: 2 }}
+          InputProps={{
+            sx: {
+              borderRadius: 1,
+              '&:hover fieldset': { borderColor: 'primary.light' }
+            }
+          }}
+        />
+        <TextField
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          fullWidth
+          margin="normal"
+          variant="outlined"
+          sx={{ mb: 2 }}
+          InputProps={{
+            sx: {
+              borderRadius: 1,
+              '&:hover fieldset': { borderColor: 'primary.light' }
+            }
+          }}
+        />
+        <Box sx={{ mt: 3 }}>
+          <Button
+            type="submit"
+            variant="contained"
             fullWidth
-            margin="normal"
-            variant="outlined"
-          />
-          <TextField
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            fullWidth
-            margin="normal"
-            variant="outlined"
-          />
-          <Box sx={{ marginTop: 3 }}>
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              color="primary"
-            >
-              Login
-            </Button>
-          </Box>
+            sx={{
+              py: 1.5,
+              borderRadius: 1,
+              textTransform: 'none',
+              fontSize: '1rem',
+              fontWeight: 600,
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-1px)',
+                boxShadow: 2
+              }
+            }}
+          >
+            Sign In
+          </Button>
         </Box>
-      </Paper>
-    </Container>
-  );
+      </Box>
+    </Paper>
+  </Container>
+);
 };
 
 export default Login;

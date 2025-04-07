@@ -6,7 +6,6 @@ import { io } from 'socket.io-client';
 const socket = io('http://localhost:5000');
 
 const Dashboard = ({ user }) => {
-  const [transactions, setTransactions] = useState([]);
   user = JSON.parse(localStorage.getItem('user'));
 
   const getStoredSettings = () => {

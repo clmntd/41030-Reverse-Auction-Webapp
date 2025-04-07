@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
+import { 
+    Container,
+    Typography,
+    List,
+    ListItem,
+    ListItemText,
+    Chip,
+    Divider,
+    Paper,
+    Box,
+    CircularProgress
+  } from '@mui/material';
+  import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const BidHistory = () => {
     const [bids, setBids] = useState([]);
@@ -51,51 +64,115 @@ const BidHistory = () => {
     }
 
     return (
-        <div>
-            {role === 'facilitator' ? (
-                <>
-                    <h2>All Bidding History</h2>
-                </>
-            ) : (
-                <>
-                    <h2>{user ? `${user.name}'s Bidding History` : 'Loading...'}</h2>
-                </>
-            )}
-            {bids.length > 0 ? (
-                bids.map((bid, index) => {
-                    const shouldRenderAuctionId = bid.auction_id !== lastAuctionId;
-                    if (shouldRenderAuctionId) {
-                        lastAuctionId = bid.auction_id;
-                    }
-
-                    const auctionWinningBids = winningBids.filter(winningBid => winningBid.auction_id === bid.auction_id);
-                    const latestBid = auctionWinningBids.reduce((max, current) => (current.bid_id > max.bid_id ? current : max), auctionWinningBids[0]);
-                    const isWinningBid = bid.bid_id === latestBid?.bid_id;
-
-                    return (
-                        <div key={index}>
-                            {shouldRenderAuctionId && (
-                                <h2>Auction ID: {bid.auction_id}</h2>
-                            )}
-                            <p
-                                style={{
-                                    fontWeight: isWinningBid ? 'bold' : 'normal',
-                                    color: isWinningBid ? 'green' : 'black',
-                                    backgroundColor: isWinningBid ? '#e6f7e6' : 'transparent',
-                                    padding: '5px',
-                                    borderRadius: '4px',
-                                }}
-                            >
-                                Bid# {bid.bid_id}: ${bid.price} by {bid.name}
-                            </p>
-                        </div>
-                    );
-                })
-            ) : (
-                <p>No bids found.</p>
-            )}
-        </div>
+        <Container maxWidth="md" sx={{ py: 4 }}>
+        <Typography 
+          variant="h4" 
+          sx={{ 
+            mb: 4,
+            fontWeight: 500,
+            color: 'text.primary'
+          }}
+        >
+          {role === 'facilitator' ? 'All Bidding History' : `${user.name}'s Bidding History`}
+        </Typography>
+  
+        {bids.length > 0 ? (
+          <Paper 
+            sx={{ 
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 2
+            }}
+          >
+            {bids.map((bid, index) => {
+              const shouldRenderAuctionId = bid.auction_id !== lastAuctionId;
+              if (shouldRenderAuctionId) lastAuctionId = bid.auction_id;
+  
+              const auctionWinningBids = winningBids.filter(winningBid => 
+                winningBid.auction_id === bid.auction_id
+              );
+              const latestBid = auctionWinningBids.reduce((max, current) => 
+                (current.bid_id > max.bid_id ? current : max), auctionWinningBids[0]
+              );
+              const isWinningBid = bid.bid_id === latestBid?.bid_id;
+  
+              return (
+                <Box key={index}>
+                  {shouldRenderAuctionId && (
+                    <>
+                      <Divider />
+                      <Box sx={{ px: 3, py: 2 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                          Auction #{bid.auction_id}
+                        </Typography>
+                      </Box>
+                      <Divider />
+                    </>
+                  )}
+                  <ListItem
+                    sx={{
+                      px: 3,
+                      py: 2,
+                      borderLeft: isWinningBid ? '4px solid' : 'none',
+                      borderColor: isWinningBid ? 'success.main' : 'transparent',
+                      backgroundColor: isWinningBid ? 'success.light' : 'background.paper',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                  >
+                    <ListItemText
+                      primary={
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <Typography variant="body1" component="span">
+                            ${bid.price}
+                          </Typography>
+                          <Chip
+                            label={`Quality: ${bid.quality}`}
+                            size="small"
+                            variant="outlined"
+                          />
+                          <Typography variant="body1" component="span" sx={{ ml: 1 }}>
+                            {bid.name}
+                          </Typography>
+                        </Box>
+                      }
+                      secondary={
+                        <Typography variant="body2" color="text.secondary">
+                          Bid #{bid.bid_id}
+                        </Typography>
+                      }
+                    />
+                    {isWinningBid && (
+                      <Chip
+                        icon={<CheckCircleIcon fontSize="small" />}
+                        label="Winning Bid"
+                        color="success"
+                        size="small"
+                        sx={{ ml: 2 }}
+                      />
+                    )}
+                  </ListItem>
+                  <Divider />
+                </Box>
+              );
+            })}
+          </Paper>
+        ) : (
+          <Paper 
+            sx={{ 
+              p: 3,
+              textAlign: 'center',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 2
+            }}
+          >
+            <Typography variant="body1" color="text.secondary">
+              No bids found
+            </Typography>
+          </Paper>
+        )}
+      </Container>
     );
-};
-
-export default BidHistory;
+  };
+  
+  export default BidHistory;
