@@ -305,11 +305,16 @@ const Auctions = () => {
                               borderRadius: 1
                             }}
                           >
+                            
+
                             <Stack direction="row" spacing={1}>
-                              <span>${bid.price}</span>
+                              <span style={{color:'black'}}>${bid.price}</span>
+                              
                               <Chip label={`Quality: ${bid.quality}`} size="small" />
-                              <span>{bid.name || bid.supplier_name}</span>
+                              <span style={{color:'black'}}>{bid.name || bid.supplier_name}</span>
                             </Stack>
+                            
+                            
                             <Chip label="Select Winner" color="primary" size="small" />
                           </Button>
                         ) : (

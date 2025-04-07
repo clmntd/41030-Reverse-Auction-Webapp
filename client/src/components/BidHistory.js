@@ -101,8 +101,8 @@ const BidHistory = () => {
                   {shouldRenderAuctionId && (
                     <>
                       <Divider />
-                      <Box sx={{ px: 3, py: 2 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                      <Box  sx={{ px: 3, py: 2, bgcolor:'#f6f6f6' }}>
+                        <Typography variant="h5" sx={{ fontWeight: 500 }}>
                           Auction #{bid.auction_id}
                         </Typography>
                       </Box>
