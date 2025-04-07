@@ -100,6 +100,10 @@ io.on('connection', (socket) => {
         io.emit('makeAuction');
     });
     
+    socket.on('dash', settings =>{
+        io.emit('dash', settings);
+    });
+
     // Handle disconnection
     socket.on('disconnect', () => {
         console.log('A user disconnected');

@@ -9,7 +9,7 @@ const BidHistory = () => {
     const role = JSON.parse(localStorage.getItem('role'));
 
     let lastAuctionId = null;
-    
+
     useEffect(() => {
         const userData = JSON.parse(localStorage.getItem('user'));
         if (userData) {
@@ -20,7 +20,7 @@ const BidHistory = () => {
     useEffect(() => {
         const fetchBids = async () => {
             if (!user) return;
-            
+
             if (user.role === 'facilitator') {
                 try {
                     const response = await api.get('/bids');
@@ -53,14 +53,14 @@ const BidHistory = () => {
     return (
         <div>
             {role === 'facilitator' ? (
-                          <>
-                            <h2>All Bidding History</h2>
-                          </>
-                        ) : (
-                          <>
-                            <h2>{user ? `${user.name}'s Bidding History` : 'Loading...'}</h2>
-                          </>
-                        )}
+                <>
+                    <h2>All Bidding History</h2>
+                </>
+            ) : (
+                <>
+                    <h2>{user ? `${user.name}'s Bidding History` : 'Loading...'}</h2>
+                </>
+            )}
             {bids.length > 0 ? (
                 bids.map((bid, index) => {
                     const shouldRenderAuctionId = bid.auction_id !== lastAuctionId;

@@ -14,9 +14,18 @@ const Auctions = () => {
   const [winningBids, setWinningBids] = useState([]);
   const [noWinningBids, setNoWinningBids] = useState([]);
   const [auctionBids, setAuctionBids] = useState({});
+
+  // const getStoredSettings = () => {
+  //   const storedState = localStorage.getItem('dashSettings');
+  //   return storedState ? JSON.parse(storedState) : { price: true, quality: true };
+  // };
+  // const [dashSettings, setDashSettings] = useState(getStoredSettings);
+
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user'));
   const role = JSON.parse(localStorage.getItem('role'));
+  const [dash, setDash] = useState(localStorage.getItem('dashSettings') || { price: true, quality: true });
+
 
   useEffect(() => {
     console.log('useeffect');
@@ -73,6 +82,10 @@ const Auctions = () => {
       } catch (error) {
         console.error('Error fetching auctions:', error);
       }
+    });
+
+    socket.on('dash', (settings) => {
+      setDash(settings);
     });
 
     return () => {
@@ -210,19 +223,22 @@ const Auctions = () => {
             <>
               {auctionBids[auction.id]?.length > 0 ? (
                 <>
-                  <h4>Current Bids</h4>
                   <ul>
+                  <h4>Current Bids</h4>
                     {auctionBids[auction.id]?.map((bid, index) => (
+
                       <li key={index}>
                         {role === 'facilitator' ? (
                           <>
                             <button onClick={() => winningBid(bid.id)}>
-                              Price: {bid.price}, Quality: {bid.quality}, Name: {bid.name}
+                              Price: ${bid.price}, Quality: {bid.quality}, Name: {bid.name}
                             </button>
                           </>
                         ) : (
                           <>
-                            Price: {bid.price}, Quality: {bid.quality}, Name: {bid.name}
+                            {dash.price && `Price: $${bid.price}, `}
+                            {dash.quality && `Quality: ${bid.quality}, `}
+                            Name: {bid.name}
                           </>
                         )}
                       </li>
@@ -234,18 +250,32 @@ const Auctions = () => {
                 getNoBid(auction.id).length > 0 ? (
                   getNoBid(auction.id).map((bid, index) => (
                     role == 'facilitator' ? (
+
                       <button key={index} onClick={() => winningBid(bid.bid_id)}>
-                        Price: {bid.price}, Quality: {bid.quality}, Name: {bid.supplier_name}
+                        Price: ${bid.price}, Quality: {bid.quality}, Name: {bid.supplier_name}
                       </button>
 
                     ) : (
                       <div>
-                        Price: {bid.price}, Quality: {bid.quality}, Name: {bid.supplier_name}
+                        {dash.price && `Price: $${bid.price}, `}
+                        {dash.quality && `Quality: ${bid.quality}, `}
+                        Name: {bid.supplier_name}
                       </div>
                     )
                   ))
                 ) : (
-                  <h4>No bids have been placed yet.</h4>
+
+
+                  role == 'facilitator' ? (
+                    <>
+                      <h4>No bids have been placed yet.</h4>
+                      <button onClick={() => deleteAuction(auction.id)}>
+                        Delete Auction
+                      </button>
+                    </>
+                  ) : (
+                    <h4>No bids have been placed yet.</h4>
+                  )
                 )
               )}
               {role !== 'facilitator' && (
