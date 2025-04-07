@@ -59,8 +59,8 @@ const BidHistory = () => {
                     }
 
                     const auctionWinningBids = winningBids.filter(winningBid => winningBid.auction_id === bid.auction_id);
-                    const highestBid = auctionWinningBids.reduce((max, current) => (current.bid_id > max.bid_id ? current : max), auctionWinningBids[0]);
-                    const isWinningBid = bid.bid_id === highestBid?.bid_id;
+                    const latestBid = auctionWinningBids.reduce((max, current) => (current.bid_id > max.bid_id ? current : max), auctionWinningBids[0]);
+                    const isWinningBid = bid.bid_id === latestBid?.bid_id;
 
                     return (
                         <div key={index}>

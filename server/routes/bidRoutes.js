@@ -10,7 +10,7 @@ router.get('/test', (req, res) => {
 //Get all bids
 router.get('/', async (req, res) => {
     const bids = await pool.query(
-        'SELECT bids.id as bid_id, auction_id, price, quality, users.name as name FROM public.bids inner join users on users.id = bids.supplier_id ORDER BY auction_id ASC');
+        'SELECT bids.id as bid_id, auction_id, price, quality, users.name as name FROM public.bids inner join users on users.id = bids.supplier_id ORDER BY auction_id ASC, bid_id ASC');
     return res.json({ bids: bids.rows });
 });
 
@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 router.get('/no-winner', async (req, res) => {
     try {
         const result = await pool.query(
-            `SELECT bids.id as bid_id, bids.auction_id, bids.price, bids.quality, users.name as supplier_name, supplier_id FROM bids INNER JOIN users ON users.id = bids.supplier_id LEFT JOIN transactions ON transactions.auction_id = bids.auction_id WHERE transactions.auction_id IS NULL ORDER BY bids.auction_id ASC`
+            `SELECT bids.id as bid_id, bids.auction_id, bids.price, bids.quality, users.name as supplier_name, supplier_id FROM bids INNER JOIN users ON users.id = bids.supplier_id LEFT JOIN transactions ON transactions.auction_id = bids.auction_id WHERE transactions.auction_id IS NULL ORDER BY bids.bid_id ASC`
         );
         return res.json({ bids: result.rows });
     } catch (error) {
