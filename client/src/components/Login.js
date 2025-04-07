@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import api from '../api';
+import { Button, TextField, Box, Typography, Container, Paper } from '@mui/material';
 
 const Login = ({ setUser }) => {
   const [email, setEmail] = useState('');
@@ -30,24 +31,54 @@ const Login = ({ setUser }) => {
   };
 
   return (
-    <form onSubmit={handleLogin}>
-      {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-      <button type="submit">Login</button>
-    </form>
+    <Container maxWidth="sm" sx={{ padding: 4 }}>
+      <Paper sx={{ padding: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Typography variant="h5" gutterBottom align="center">
+          Login
+        </Typography>
+        
+        {/* Error Message */}
+        {error && (
+          <Typography variant="body2" color="error" sx={{ marginBottom: 2 }}>
+            {error}
+          </Typography>
+        )}
+
+        {/* Login Form */}
+        <Box component="form" onSubmit={handleLogin} sx={{ width: '100%' }}>
+          <TextField
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            fullWidth
+            margin="normal"
+            variant="outlined"
+          />
+          <TextField
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            fullWidth
+            margin="normal"
+            variant="outlined"
+          />
+          <Box sx={{ marginTop: 3 }}>
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              color="primary"
+            >
+              Login
+            </Button>
+          </Box>
+        </Box>
+      </Paper>
+    </Container>
   );
 };
 
