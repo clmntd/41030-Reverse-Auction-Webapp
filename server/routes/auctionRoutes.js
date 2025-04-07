@@ -9,7 +9,7 @@ router.get('/test', (req, res) => {
 
 //Get all auctions
 router.get('/', async (req, res) => {
-    const auctions = await pool.query('SELECT * FROM public.auctions');
+    const auctions = await pool.query('select * from auctions order by id ASC');
     return res.json({ auctions: auctions.rows });
 });
 
@@ -18,8 +18,8 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
 
     const auctions = await pool.query(
-        'SELECT auction_id, bids.id AS bid_id, price, quality, facilitator_id, supplier_id, users.name AS name FROM auctions INNER JOIN bids ON bids.auction_id = auctions.id INNER JOIN users ON users.id = bids.supplier_id WHERE auctions.id IN (SELECT DISTINCT auction_id FROM bids WHERE supplier_id = $1) ORDER BY auction_id ASC, bids.id ASC', [id]);
-    console.log('AUCTION', auctions.rows);
+        'select auction_id, bids.id AS bid_id, price, quality, facilitator_id, supplier_id, users.name as name from auctions inner join bids ON bids.auction_id = auctions.id inner join users on users.id = bids.supplier_id where auctions.id in (select distinct auction_id from bids where supplier_id = $1) order by auction_id asc, bids.id asc', [id]);
+    console.log('Auction routes get /:id auctions.rows: ', auctions.rows);
     if (auctions.rows.some(x => x.supplier_id == id)) {
         return res.json({ auctions: auctions.rows });
     } else {
@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
 //Delete an auction
 router.delete('/:id', async (req, res) => {
     const { userId } = req.body;
-    const user = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+    const user = await pool.query('select * from users where id = $1', [userId]);
     if (user.rows.length === 0) {
         return res.status(400).json({ message: 'User not found' });
     }
@@ -54,14 +54,14 @@ router.delete('/:id', async (req, res) => {
         return res.status(400).json({ message: 'User is not a facilitator' });
     }
     const { id } = req.params;
-    const auction = await pool.query('select * from auctions WHERE id = $1', [id]);
+    const auction = await pool.query('select * from auctions where id = $1', [id]);
     if (auction.rows.length === 0) {
         return res.status(400).json({ message: 'Auction not found' });
     }
     try {
         await pool.query('delete from auctions where id = $1;', [id]);
         await pool.query('delete from bids where auction_id = $1;', [id]);
-        console.log('auctionroutes delete');
+        console.log('Auction routes delete /:id');
         return res.status(200).json({ message: `Auction ${id} deleted successfully` });
     } catch (err) {
         console.error('Error deleting auctions:', err);

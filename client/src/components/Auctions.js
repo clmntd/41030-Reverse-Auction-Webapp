@@ -28,17 +28,17 @@ const Auctions = () => {
 
 
   useEffect(() => {
-    console.log('useeffect');
+    console.log('Auction.js useEffect is triggered');
 
     const fetchAuctions = async () => {
       try {
         const response = await api.get('/auctions');
         const response2 = await api.get('/transactions');
-        const response3 = await api.get('/bids/no-winner');
+        const response3 = await api.get('/bids/noWinner');
         setAuctions(response.data.auctions);
         setWinningBids(response2.data);
         setNoWinningBids(response3.data.bids);
-        console.log(response3.data);
+        console.log('Auction.js bids/noWinner data:', response3.data);
       } catch (err) {
         console.error('Error fetching auctions:', err);
       }
@@ -90,6 +90,10 @@ const Auctions = () => {
 
     return () => {
       socket.off('newBid');
+      socket.off('winningBid');
+      socket.off('deleteAuction');
+      socket.off('makeAuction');
+      socket.off('dash');
     };
   }, [auctionBids]);
 
@@ -177,7 +181,7 @@ const Auctions = () => {
   const winningBid = async (bidId) => {
     try {
       const response = await api.post('/transactions', { bidId });
-      console.log('Winning Bid from auctions winning bid function: ', response);
+      console.log('Auctions.js winngBid response: ', response);
       socket.emit('winningBid');
     } catch (err) {
       console.error('Error winning bid');
@@ -196,7 +200,7 @@ const Auctions = () => {
 
   const getNoBid = (auctionId) => {
     const bids = noWinningBids.filter(x => x.auction_id == auctionId);
-    console.log('BIIIIIDS', bids);
+    console.log('Auction.js bids: ', bids);
     if (bids) {
       return bids;
     } else {
@@ -212,7 +216,10 @@ const Auctions = () => {
           <h3>Auction {auction.id}</h3>
           {winningBids.some((x) => x.auction_id === auction.id) ? (
             <>
+            <ul>
+
               Winning Bid of ${winPrice(auction.id)} by {winWho(auction.id)}
+            </ul>
               {role === 'facilitator' && (
                 <button onClick={() => deleteAuction(auction.id)}>
                   Delete Auction
@@ -223,8 +230,8 @@ const Auctions = () => {
             <>
               {auctionBids[auction.id]?.length > 0 ? (
                 <>
-                  <ul>
                   <h4>Current Bids</h4>
+                  <ul>
                     {auctionBids[auction.id]?.map((bid, index) => (
 
                       <li key={index}>
@@ -244,28 +251,38 @@ const Auctions = () => {
                       </li>
                     ))}
                   </ul>
-                  <h5>Last Bid: </h5>
+                  {role === 'facilitator' ? (
+                    <button onClick={() => deleteAuction(auction.id)}>Delete Auction</button>
+                  ) : null}
                 </>
               ) : (
                 getNoBid(auction.id).length > 0 ? (
-                  getNoBid(auction.id).map((bid, index) => (
-                    role == 'facilitator' ? (
-
-                      <button key={index} onClick={() => winningBid(bid.bid_id)}>
-                        Price: ${bid.price}, Quality: {bid.quality}, Name: {bid.supplier_name}
-                      </button>
-
-                    ) : (
-                      <div>
-                        {dash.price && `Price: $${bid.price}, `}
-                        {dash.quality && `Quality: ${bid.quality}, `}
-                        Name: {bid.supplier_name}
-                      </div>
-                    )
-                  ))
+                  <>
+                    <h4>Current Bids</h4>
+                    <ul>
+                      {getNoBid(auction.id).map((bid, index) => (
+                        role == 'facilitator' ? (
+                          <li>
+                            <button key={index} onClick={() => winningBid(bid.bid_id)}>
+                              Price: ${bid.price}, Quality: {bid.quality}, Name: {bid.supplier_name}
+                            </button>
+                          </li>
+                        ) : (
+                          <li>
+                            <div>
+                              {dash.price && `Price: $${bid.price}, `}
+                              {dash.quality && `Quality: ${bid.quality}, `}
+                              Name: {bid.supplier_name}
+                            </div>
+                          </li>
+                        )
+                      ))}
+                    </ul>
+                    {role === 'facilitator' ? (
+                      <button onClick={() => deleteAuction(auction.id)}>Delete Auction</button>
+                    ) : null}
+                  </>
                 ) : (
-
-
                   role == 'facilitator' ? (
                     <>
                       <h4>No bids have been placed yet.</h4>
@@ -294,9 +311,9 @@ const Auctions = () => {
                     onChange={(e) =>
                       handleAuctionValuesChange(auction.id, 'quality', e.target.value)
                     }
-                    placeholder="Quality"
+                    placeholder="Quality 1-5"
                   />
-                  <button onClick={() => placeBid(auction.id)}>Bid</button>
+                  <button onClick={() => placeBid(auction.id)} disabled={!auctionValues[auction.id]?.price || !auctionValues[auction.id]?.quality}>Bid</button>
                 </div>
               )}
             </>

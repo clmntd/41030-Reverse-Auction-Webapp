@@ -16,7 +16,6 @@ const Login = ({ setUser }) => {
         if (response.data.user) {
           localStorage.setItem('user', JSON.stringify(response.data.user));
           localStorage.setItem('role', JSON.stringify(response.data.user.role));
-          // setUser(response.data.user);
           window.location.href = '/dashboard';
         } else {
           setError('Invalid response from server');

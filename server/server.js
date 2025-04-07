@@ -49,8 +49,6 @@ if (app.router && app.router.stack) {
 }
 
 
-// console.log(app.router);
-// console.log(app.router.stack);
 
 //Start the server
 const PORT = process.env.PORT || 5000;
@@ -60,7 +58,7 @@ const server = app.listen(PORT, () => {
 
 const io = require('socket.io')(server, {
     cors: {
-        origin: 'http://localhost:3000', // your frontend origin
+        origin: 'http://localhost:3000',
         methods: ['GET', 'POST']
     }
 });
@@ -68,24 +66,15 @@ const io = require('socket.io')(server, {
 io.on('connection', (socket) => {
     console.log('A user connected');
 
-    // Receive messages from the client
+    //Receive messages from the client
     socket.on('message', (msg) => {
         console.log('Received message:', msg);
-
-        // Send a response only to the specific client (current behavior)
-
-        // Broadcast message to all connected clients
         io.emit('message', 'Hello, All Clients!');
     });
 
     socket.on('placeBid', bidData => {
         console.log('Bid data:', bidData);
-
-        // Send the bid data only to the client that placed the bid
-        // socket.emit('newBid', bidData);
-
-        // Broadcast the bid data to all connected clients
-        io.emit('newBid', bidData); // This sends the bid data to everyone
+        io.emit('newBid', bidData);
     });
 
     socket.on('winningBid', () => {
@@ -99,8 +88,8 @@ io.on('connection', (socket) => {
     socket.on('makeAuction', () => {
         io.emit('makeAuction');
     });
-    
-    socket.on('dash', settings =>{
+
+    socket.on('dash', settings => {
         io.emit('dash', settings);
     });
 

@@ -10,15 +10,15 @@ router.get('/test', (req, res) => {
 //Get all bids
 router.get('/', async (req, res) => {
     const bids = await pool.query(
-        'SELECT bids.id as bid_id, auction_id, price, quality, users.name as name FROM public.bids inner join users on users.id = bids.supplier_id ORDER BY auction_id ASC, bid_id ASC');
+        'select bids.id as bid_id, auction_id, price, quality, users.name as name from public.bids inner join users on users.id = bids.supplier_id order by auction_id asc, bid_id asc');
     return res.json({ bids: bids.rows });
 });
 
 // Get all bids where there are no winners (no transaction)
-router.get('/no-winner', async (req, res) => {
+router.get('/noWinner', async (req, res) => {
     try {
         const result = await pool.query(
-            `SELECT bids.id as bid_id, bids.auction_id, bids.price, bids.quality, users.name as supplier_name, supplier_id FROM bids INNER JOIN users ON users.id = bids.supplier_id LEFT JOIN transactions ON transactions.auction_id = bids.auction_id WHERE transactions.auction_id IS NULL ORDER BY auction_id ASC, bids.id ASC`
+            `select bids.id as bid_id, bids.auction_id, bids.price, bids.quality, users.name as supplier_name, supplier_id from bids inner join users on users.id = bids.supplier_id left join transactions on transactions.auction_id = bids.auction_id where transactions.auction_id is NULL order by auction_id asc, bids.id asc`
         );
         return res.json({ bids: result.rows });
     } catch (error) {
@@ -33,7 +33,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const bids = await pool.query(
-            'SELECT bids.id as bid_id, auction_id, price, quality, users.name as name FROM public.bids inner join users on users.id = bids.supplier_id where auction_id = $1 ORDER BY auction_id ASC', [id]);
+            'select bids.id as bid_id, auction_id, price, quality, users.name as name from bids inner join users on users.id = bids.supplier_id where auction_id = $1 order by auction_id asc', [id]);
         return res.json({ bids: bids.rows });
     } catch (error) {
         console.error('Error fetching bids:', error);
@@ -54,7 +54,7 @@ router.post('/place', async (req, res) => {
     );
 
     const bidId = result.rows[0].id;
-    // console.log(bidId, 'bidsjfkdsdf');
+    console.log('Bid routes post /place bidId: ', bidId);
     res.json({
         message: `Bid of ${price} placed for auction ${auctionId} by ${supplierId}`,
         bidId: bidId,
