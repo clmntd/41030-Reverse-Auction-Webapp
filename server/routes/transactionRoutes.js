@@ -53,6 +53,7 @@ router.post('/', async (req, res) => {
             'insert into transactions(auction_id, winner_id, final_price) values ($1, $2, $3)',
             [bigdata.auction_id, bigdata.supplier_id, bigdata.price]
         );
+        await pool.query('UPDATE auctions SET status = $1 WHERE id = $2', ['closed', bigdata.auction_id]);        
     } catch (error) {
         console.error('Error creating transaction:', error);
         throw new Error('Error creating transaction');

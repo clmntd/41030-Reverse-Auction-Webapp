@@ -46,6 +46,7 @@ const BidHistory = () => {
         return <h2>Loading...</h2>;
     }
 
+
     return (
         <div>
             <h2>{user ? `${user.name}'s Dashboard` : 'Loading...'}</h2>
