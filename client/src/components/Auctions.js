@@ -31,35 +31,47 @@ const Auctions = () => {
   const [noWinningBids, setNoWinningBids] = useState([]);
   const [auctionBids, setAuctionBids] = useState({});
 
-  // const getStoredSettings = () => {
-  //   const storedState = localStorage.getItem('dashSettings');
-  //   return storedState ? JSON.parse(storedState) : { price: true, quality: true };
-  // };
-  // const [dashSettings, setDashSettings] = useState(getStoredSettings);
+
 
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user'));
   const role = JSON.parse(localStorage.getItem('role'));
-  const [dash, setDash] = useState(localStorage.getItem('dashSettings') ||
-  {
-    price: true,
-    quality: true,
-    number: true,
-    name: true
-  });
+  
+  const [dash, setDash] = useState(getData());
+
+  function getData() {
+    const data = localStorage.getItem('dashSettings')
+    if (data) {
+      return JSON.parse(data)
+    }
+    else {
+      return {
+        price: false,
+        quality: false,
+        number: true,
+        name: false
+      }
+    }
+  }
 
 
   useEffect(() => {
     console.log('Auction.js useEffect is triggered');
+    console.log('Auction.js role data:', role);
+    console.log('Auction.js dash data:', dash);
+
+    let isMounted = true;
 
     const fetchAuctions = async () => {
       try {
         const response = await api.get('/auctions');
         const response2 = await api.get('/transactions');
         const response3 = await api.get('/bids/noWinner');
-        setAuctions(response.data.auctions);
-        setWinningBids(response2.data);
-        setNoWinningBids(response3.data.bids);
+        if (isMounted) {
+          setAuctions(response.data.auctions);
+          setWinningBids(response2.data);
+          setNoWinningBids(response3.data.bids);
+        }
         console.log('Auction.js bids/noWinner data:', response3.data);
       } catch (err) {
         console.error('Error fetching auctions:', err);
@@ -111,6 +123,7 @@ const Auctions = () => {
 
     socket.on('dash', (settings) => {
       setDash(settings);
+
     });
 
     return () => {
@@ -119,8 +132,9 @@ const Auctions = () => {
       socket.off('deleteAuction');
       socket.off('makeAuction');
       socket.off('dash');
+      isMounted = false;
     };
-  }, [auctions]);
+  }, []);
 
   const handleAuctionValuesChange = (auctionId, field, value) => {
     setAuctionValues((prevValues) => ({
@@ -192,11 +206,11 @@ const Auctions = () => {
         const result = await api.post('/bids/place', bidData, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        socket.emit('placeBid', { 
+        socket.emit('placeBid', {
           ...bidData,
           id: result.data.bidId,
           bid_id: result.data.bidId,
-          name: result.data.name 
+          name: result.data.name
         });
       } catch (err) {
         console.error('Error placing bid:', err);
@@ -256,6 +270,7 @@ const Auctions = () => {
           >
             New Auction
           </Button>
+
         )}
       </Box>
 
@@ -317,22 +332,66 @@ const Auctions = () => {
                               borderRadius: 1
                             }}
                           >
-                            <Stack direction="row" spacing={1}>
-                              <span style={{ color: 'black' }}>#{bid.bid_id}</span>
-                              <span style={{ color: 'black' }}>${bid.price}</span>
-                              <Chip label={`Quality: ${bid.quality}`} size="small" />
-                              <span style={{ color: 'black' }}>{bid.name || bid.supplier_name}</span>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                              <Chip
+                                label={`#${bid.bid_id}`}
+                                size="small"
+                                color="primary"
+                                variant={dash.number ? 'outlined' : 'filled'}
+                              />
+                              <Chip
+                                label={`$${bid.price}`}
+                                size="small"
+                                color="secondary"
+                                variant={dash.price ? 'outlined' : 'filled'}
+                              />
+                              <Chip
+                                label={`Quality: ${bid.quality}`}
+                                size="small"
+                                color="default"
+                                variant={dash.quality ? 'outlined' : 'filled'}
+                              />
+                              <Chip
+                                label={bid.name || bid.supplier_name}
+                                size="small"
+                                color="info"
+                                variant={dash.name ? 'outlined' : 'filled'}
+                              />
                             </Stack>
-                            <Chip label="Select Winner" color="primary" size="small" />
+                            <Chip
+                              label="Select Winner"
+                              color="primary"
+                              size="small"
+                              sx={{ fontWeight: 500 }}
+                            />
                           </Button>
                         ) : (
                           <ListItemText
                             primary={
                               <Stack direction="row" spacing={2} alignItems="center">
-                                {dash.number && <span style={{ color: 'black' }}>#{bid.bid_id}</span>}
-                                {dash.price && <span>${bid.price}</span>}
-                                {dash.quality && <Chip label={`Quality: ${bid.quality}`} size="small" />}
-                                {dash.name && <span>{bid.name || bid.supplier_name}</span>}
+                                {dash.number && <Chip
+                                  label={`#${bid.bid_id}`}
+                                  size="small"
+                                  variant={dash.number ? "outlined" : "filled"}
+                                  sx={{ backgroundColor: 'background.paper' }}
+                                />}
+                                {dash.price && <Chip
+                                  label={`$${bid.price}`}
+                                  size="small"
+                                  variant={dash.price ? "outlined" : "filled"}
+                                  sx={{ backgroundColor: 'background.paper' }}
+                                />}
+                                {dash.quality && <Chip
+                                  label={`Quality: ${bid.quality}`}
+                                  size="small"
+                                  variant={dash.quality ? "outlined" : "filled"}
+                                  sx={{ backgroundColor: 'background.paper' }}
+                                />}
+                                {dash.name && (
+                                  <Typography variant="body2">
+                                    {bid.name || bid.supplier_name}
+                                  </Typography>
+                                )}
                               </Stack>
                             }
                           />

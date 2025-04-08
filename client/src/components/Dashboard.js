@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   CircularProgress,
@@ -23,6 +23,12 @@ const Dashboard = ({ user }) => {
     return storedState ? JSON.parse(storedState) : { price: true, quality: true, number: true, name: true };
   };
   const [state, setState] = useState(getStoredSettings);
+
+  useEffect(() => {
+    if (user) {
+      socket.emit('dash', state);
+    }
+  }, [user, state]);
 
   const handleChange = (event) => {
     const newState = {
