@@ -1,11 +1,36 @@
 import React, { useState } from 'react';
 import api from '../api';
-import { Button, TextField, Box, Typography, Container, Paper } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import {
+  Button,
+  Box,
+  Container,
+  FormControl,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+  Paper,
+  TextField,
+  Typography
+} from '@mui/material';
 
 const Login = ({ setUser }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
   const [error, setError] = useState('');
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpPassword = (event) => {
+    event.preventDefault();
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -31,121 +56,128 @@ const Login = ({ setUser }) => {
   };
 
   return (
-    <Container 
-    maxWidth="sm" 
-    sx={{ 
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      py: 4
-    }}
-  >
-    <Paper 
-      sx={{ 
-        padding: 4,
-        width: '100%',
-        maxWidth: 400,
-        boxShadow: 3,
-        borderRadius: 2,
-        border: '1px solid',
-        borderColor: 'divider',
-        backgroundColor: 'background.paper'
+    <Container
+      maxWidth="sm"
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        py: 4
       }}
     >
-      <Typography 
-        variant="h4" 
-        sx={{ 
-          mb: 3,
-          fontWeight: 500,
-          textAlign: 'center',
-          color: 'text.primary'
+      <Paper
+        sx={{
+          padding: 4,
+          width: '100%',
+          maxWidth: 400,
+          boxShadow: 3,
+          borderRadius: 2,
+          border: '1px solid',
+          borderColor: 'divider',
+          backgroundColor: 'background.paper'
         }}
       >
-        Welcome Back
-      </Typography>
-      
-      {error && (
-        <Typography 
-          variant="body2" 
-          color="error"
-          sx={{ 
-            mb: 2,
-            py: 1,
-            px: 2,
-            backgroundColor: 'error.light',
-            borderRadius: 1,
-            textAlign: 'center'
+        <Typography
+          variant="h4"
+          sx={{
+            mb: 3,
+            fontWeight: 500,
+            textAlign: 'center',
+            color: 'text.primary'
           }}
         >
-          {error}
+          Welcome Back
         </Typography>
-      )}
 
-      <Box 
-        component="form" 
-        onSubmit={handleLogin} 
-        sx={{ width: '100%' }}
-      >
-        <TextField
-          label="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          fullWidth
-          margin="normal"
-          variant="outlined"
-          sx={{ mb: 2 }}
-          InputProps={{
-            sx: {
-              borderRadius: 1,
-              '&:hover fieldset': { borderColor: 'primary.light' }
-            }
-          }}
-        />
-        <TextField
-          label="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          fullWidth
-          margin="normal"
-          variant="outlined"
-          sx={{ mb: 2 }}
-          InputProps={{
-            sx: {
-              borderRadius: 1,
-              '&:hover fieldset': { borderColor: 'primary.light' }
-            }
-          }}
-        />
-        <Box sx={{ mt: 3 }}>
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
+        {error && (
+          <Typography
+            variant="body2"
+            color="error"
             sx={{
-              py: 1.5,
+              mb: 2,
+              py: 1,
+              px: 2,
+              backgroundColor: 'error.light',
               borderRadius: 1,
-              textTransform: 'none',
-              fontSize: '1rem',
-              fontWeight: 600,
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                transform: 'translateY(-1px)',
-                boxShadow: 2
-              }
+              textAlign: 'center'
             }}
           >
-            Sign In
-          </Button>
+            {error}
+          </Typography>
+        )}
+
+        <Box
+          component="form"
+          onSubmit={handleLogin}
+          sx={{ width: '100%' }}
+        >
+          <TextField
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            fullWidth
+            margin="normal"
+            variant="outlined"
+            sx={{ mb: 2 }}
+            InputProps={{
+              sx: {
+                borderRadius: 1,
+                '&:hover fieldset': { borderColor: 'primary.light' }
+              }
+            }}
+          />
+          <FormControl fullWidth margin="normal" variant="outlined" sx={{ mb: 2 }}>
+            <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+            <OutlinedInput
+              id="outlined-adornment-password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)} // Corrected here to update password
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label={showPassword ? 'hide the password' : 'display the password'}
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    onMouseUp={handleMouseUpPassword}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
+              label="Password"
+              required
+            />
+          </FormControl>
+          <Box sx={{ mt: 3 }}>
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              sx={{
+                py: 1.5,
+                borderRadius: 1,
+                textTransform: 'none',
+                fontSize: '1rem',
+                fontWeight: 600,
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': {
+                  transform: 'translateY(-1px)',
+                  boxShadow: 2
+                }
+              }}
+            >
+              Sign In
+            </Button>
+          </Box>
         </Box>
-      </Box>
-    </Paper>
-  </Container>
-);
+      </Paper>
+    </Container>
+  );
 };
 
 export default Login;

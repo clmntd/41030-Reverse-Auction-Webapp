@@ -3,14 +3,12 @@ import api from '../api';
 import { 
     Container,
     Typography,
-    List,
     ListItem,
     ListItemText,
     Chip,
     Divider,
     Paper,
-    Box,
-    CircularProgress
+    Box
   } from '@mui/material';
   import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 

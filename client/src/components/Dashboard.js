@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import * as React from 'react';
-import api from '../api';
 import Switch from '@mui/material/Switch';
 import { io } from 'socket.io-client';
 const socket = io('http://localhost:5000');
