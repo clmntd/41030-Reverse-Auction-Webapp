@@ -22,6 +22,7 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = React.useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -43,8 +44,16 @@ const Register = () => {
         password,
         role: 'supplier',
       });
-      console.log('Registration successful:', response.data);
+      if (response && response.data) {
+        setSuccess(response.data.message);
+        setError('');
+        console.log('Registration successful:', response.data);
+      } else {
+        throw new Error('Unexpected response structure');
+      }
     } catch (error) {
+      console.log('Register.js catch error: ',error.response.data.message);
+      setSuccess('');
       setError(error.response?.data?.message || 'Something went wrong');
       console.error('Error registering:', error.response.data.message);
     }
@@ -84,6 +93,38 @@ const Register = () => {
         >
           Register
         </Typography>
+        {error && (
+          <Typography
+            variant="body2"
+            color="error"
+            sx={{
+              mb: 2,
+              py: 1,
+              px: 2,
+              backgroundColor: 'error.light',
+              borderRadius: 1,
+              textAlign: 'center'
+            }}
+          >
+            {error}
+          </Typography>
+        )}
+        {success && (
+          <Typography
+            variant="body2"
+            color="success"
+            sx={{
+              mb: 2,
+              py: 1,
+              px: 2,
+              backgroundColor: 'success.light',
+              borderRadius: 1,
+              textAlign: 'center'
+            }}
+          >
+            {success}
+          </Typography>
+        )}
         <Box
           component="form"
           onSubmit={handleSubmit}
@@ -128,7 +169,8 @@ const Register = () => {
               id="outlined-adornment-password"
               type={showPassword ? 'text' : 'password'}
               value={password}
-              onChange={(e) => setPassword(e.target.value)} // Corrected here to update password
+              onChange={(e) => setPassword(e.target.value)}
+              required
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
@@ -143,7 +185,6 @@ const Register = () => {
                 </InputAdornment>
               }
               label="Password"
-              required
             />
           </FormControl>
 

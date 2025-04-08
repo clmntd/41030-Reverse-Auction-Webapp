@@ -61,11 +61,7 @@ router.post('/login', async (req, res) => {
 router.post('/register', async(req, res) => {
   const { name, email, password, role } = req.body;
   console.log('HITT REGG');
-  try{
-    // if (role !== 'facilitator') {
-    //   return res.status(400).json({ message: 'Only facilitators can register' });
-    // }
-  
+  try{ 
     //Check if user already exists
     const checkUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (checkUser.rows.length > 0) {
@@ -79,15 +75,13 @@ router.post('/register', async(req, res) => {
       'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role',
       [name, email, hashedPassword, role]
     );
-    res.json({ message: `User ${username} registered successfully!` });
+
+    return res.json({ message: `User ${result.rows[0].name} registered successfully!` });
   }catch(error){
     console.error('Error creating user:', error);
-    throw new Error('Error creating user');
+    return res.status(500).json({ message: 'Error creating user' });
   }
 });
-
-// router.post('/login',loginUser);
-// router.post('/register', registerUser);
 
 console.log('✅ authRoutes file loaded:', __filename);
 console.log(router.stack.map(layer => layer.route?.path || 'Middleware'));

@@ -42,7 +42,7 @@ const Login = ({ setUser }) => {
         if (response.data.user) {
           localStorage.setItem('user', JSON.stringify(response.data.user));
           localStorage.setItem('role', JSON.stringify(response.data.user.role));
-          window.location.href = '/dashboard';
+          window.location.href = '/auctions';
         } else {
           setError('Invalid response from server');
         }
@@ -51,6 +51,7 @@ const Login = ({ setUser }) => {
       }
     } catch (err) {
       console.error('Error logging in:', err);
+      console.log(err.response?.data?.message);
       setError(err.response?.data?.message || 'Failed to login. Please check your credentials.');
     }
   };
@@ -136,6 +137,7 @@ const Login = ({ setUser }) => {
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)} // Corrected here to update password
+              required
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
@@ -150,7 +152,6 @@ const Login = ({ setUser }) => {
                 </InputAdornment>
               }
               label="Password"
-              required
             />
           </FormControl>
           <Box sx={{ mt: 3 }}>
@@ -171,7 +172,7 @@ const Login = ({ setUser }) => {
                 }
               }}
             >
-              Sign In
+              Login
             </Button>
           </Box>
         </Box>

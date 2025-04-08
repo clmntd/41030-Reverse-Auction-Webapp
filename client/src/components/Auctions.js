@@ -215,7 +215,7 @@ const Auctions = () => {
   };
 
   const getNoBid = (auctionId) => {
-    const bids = noWinningBids.filter(x => x.auction_id == auctionId);
+    const bids = noWinningBids.filter(x => x.auction_id === auctionId);
     console.log('Auction.js bids: ', bids);
     if (bids) {
       return bids;
