@@ -302,7 +302,7 @@ const Auctions = () => {
 
           {winningBids.some((x) => x.auction_id === auction.id) ? (
             <Paper sx={{ p: 2, bgcolor: 'success.light', borderRadius: 1 }}>
-              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+              <Typography variant="body1" sx={{ fontWeight: 500 , color: 'white'}}>
                 🏆 Winning Bid: ${winPrice(auction.id)} by {winWho(auction.id)}
               </Typography>
             </Paper>
@@ -355,7 +355,7 @@ const Auctions = () => {
                               <Chip
                                 label={bid.name || bid.supplier_name}
                                 size="small"
-                                color="info"
+                                color="success"
                                 variant={dash.name ? 'outlined' : 'filled'}
                               />
                             </Stack>

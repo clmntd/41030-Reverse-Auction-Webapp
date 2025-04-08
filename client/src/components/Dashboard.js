@@ -92,7 +92,7 @@ const Dashboard = ({ user }) => {
               checked={state.price}
               onChange={handleChange}
               name="price"
-              color="primary"
+              color="secondary"
             />
           </ListItem>
 
@@ -106,7 +106,7 @@ const Dashboard = ({ user }) => {
               checked={state.quality}
               onChange={handleChange}
               name="quality"
-              color="primary"
+              color="default"
             />
           </ListItem>
 
@@ -120,7 +120,7 @@ const Dashboard = ({ user }) => {
               checked={state.name}
               onChange={handleChange}
               name="name"
-              color="primary"
+              color="success"
             />
           </ListItem>
         </List>

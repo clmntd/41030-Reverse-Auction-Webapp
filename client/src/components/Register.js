@@ -96,8 +96,9 @@ const Register = () => {
         {error && (
           <Typography
             variant="body2"
-            color="error"
+            color="white"
             sx={{
+              fontWeight: 700,
               mb: 2,
               py: 1,
               px: 2,
@@ -112,8 +113,9 @@ const Register = () => {
         {success && (
           <Typography
             variant="body2"
-            color="success"
+            color="white"
             sx={{
+              fontWeight: 700,
               mb: 2,
               py: 1,
               px: 2,
