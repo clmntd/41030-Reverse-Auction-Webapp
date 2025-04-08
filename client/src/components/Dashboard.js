@@ -1,7 +1,18 @@
 import { useState } from 'react';
-import * as React from 'react';
-import Switch from '@mui/material/Switch';
+import {
+  Box,
+  CircularProgress,
+  Container,
+  Divider,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  Switch,
+  Typography
+} from '@mui/material';
 import { io } from 'socket.io-client';
+
 const socket = io('http://localhost:5000');
 
 const Dashboard = ({ user }) => {
@@ -9,13 +20,11 @@ const Dashboard = ({ user }) => {
 
   const getStoredSettings = () => {
     const storedState = localStorage.getItem('dashSettings');
-    console.log('Dashboard.js storedState:', storedState);
-    return storedState ? JSON.parse(storedState) : { price: true, quality: true };
+    return storedState ? JSON.parse(storedState) : { price: true, quality: true, number: true, name: true };
   };
   const [state, setState] = useState(getStoredSettings);
 
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event) => {
     const newState = {
       ...state,
       [event.target.name]: event.target.checked,
@@ -25,14 +34,92 @@ const Dashboard = ({ user }) => {
     socket.emit('dash', newState);
   };
 
+  if (!user) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
-    <div>
-      <h2>{user ? `${user.name}'s Dashboard` : 'Loading...'}</h2>
-      <Switch checked={state.price} onChange={handleChange} name="price" />
-      Price Transparency
-      <Switch checked={state.quality} onChange={handleChange} name="quality" />
-      Quality Transparency
-    </div>
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Paper
+        sx={{
+          p: 3,
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 2
+        }}
+      >
+        <Typography
+          variant="h4"
+          sx={{
+            mb: 3,
+            fontWeight: 500,
+            color: 'text.primary'
+          }}
+        >
+          {user.name}'s Dashboard
+        </Typography>
+
+        <List sx={{ width: '100%' }}>
+          <ListItem sx={{ px: 0, mt: 1 }}>
+            <ListItemText
+              primary="Bid Number Transparency"
+              secondary="Display bid number to suppliers" />
+            <Switch
+              checked={state.number}
+              onChange={handleChange}
+              name="number"
+              color="primary"
+            />
+          </ListItem>
+
+          <Divider />
+
+          <ListItem sx={{ px: 0 }}>
+            <ListItemText
+              primary="Price Transparency"
+              secondary="Display price information to suppliers" />
+            <Switch
+              checked={state.price}
+              onChange={handleChange}
+              name="price"
+              color="primary"
+            />
+          </ListItem>
+
+          <Divider />
+
+          <ListItem sx={{ px: 0, mt: 1 }}>
+            <ListItemText
+              primary="Quality Transparency"
+              secondary="Display quality ratings to suppliers" />
+            <Switch
+              checked={state.quality}
+              onChange={handleChange}
+              name="quality"
+              color="primary"
+            />
+          </ListItem>
+
+          <Divider />
+
+          <ListItem sx={{ px: 0 }}>
+            <ListItemText
+              primary="Name Transparency"
+              secondary="Display the name on a placed bid to suppliers" />
+            <Switch
+              checked={state.name}
+              onChange={handleChange}
+              name="name"
+              color="primary"
+            />
+          </ListItem>
+        </List>
+      </Paper>
+    </Container>
   );
 };
 

@@ -40,7 +40,13 @@ const Auctions = () => {
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user'));
   const role = JSON.parse(localStorage.getItem('role'));
-  const [dash, setDash] = useState(localStorage.getItem('dashSettings') || { price: true, quality: true });
+  const [dash, setDash] = useState(localStorage.getItem('dashSettings') ||
+  {
+    price: true,
+    quality: true,
+    number: true,
+    name: true
+  });
 
 
   useEffect(() => {
@@ -68,7 +74,10 @@ const Auctions = () => {
         if (!updatedBids[bidData.auctionId]) {
           updatedBids[bidData.auctionId] = [];
         }
-        updatedBids[bidData.auctionId].push(bidData);
+        updatedBids[bidData.auctionId].push({
+          ...bidData,
+          bid_id: bidData.bid_id || bidData.id
+        });
         return updatedBids;
       });
     });
@@ -111,7 +120,7 @@ const Auctions = () => {
       socket.off('makeAuction');
       socket.off('dash');
     };
-  }, [auctionBids]);
+  }, [auctions]);
 
   const handleAuctionValuesChange = (auctionId, field, value) => {
     setAuctionValues((prevValues) => ({
@@ -127,11 +136,11 @@ const Auctions = () => {
     if (role === 'facilitator') {
       const userId = user.id;
       try {
-        socket.emit('deleteAuction');
         const result = await api.delete(`/auctions/${auction_id}`, {
           data: { userId },
         });
         if (result.status === 200) {
+          socket.emit('deleteAuction');
           console.log(`Auction ${auction_id} deleted successfully.`);
           setAuctions((prevAuctions) =>
             prevAuctions.filter((auction) => auction.id !== auction_id)
@@ -183,9 +192,12 @@ const Auctions = () => {
         const result = await api.post('/bids/place', bidData, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        bidData.id = result.data.bidId;
-        bidData.name = result.data.name;
-        socket.emit('placeBid', bidData);
+        socket.emit('placeBid', { 
+          ...bidData,
+          id: result.data.bidId,
+          bid_id: result.data.bidId,
+          name: result.data.name 
+        });
       } catch (err) {
         console.error('Error placing bid:', err);
       }
@@ -305,25 +317,22 @@ const Auctions = () => {
                               borderRadius: 1
                             }}
                           >
-                            
-
                             <Stack direction="row" spacing={1}>
-                              <span style={{color:'black'}}>${bid.price}</span>
-                              
+                              <span style={{ color: 'black' }}>#{bid.bid_id}</span>
+                              <span style={{ color: 'black' }}>${bid.price}</span>
                               <Chip label={`Quality: ${bid.quality}`} size="small" />
-                              <span style={{color:'black'}}>{bid.name || bid.supplier_name}</span>
+                              <span style={{ color: 'black' }}>{bid.name || bid.supplier_name}</span>
                             </Stack>
-                            
-                            
                             <Chip label="Select Winner" color="primary" size="small" />
                           </Button>
                         ) : (
                           <ListItemText
                             primary={
                               <Stack direction="row" spacing={2} alignItems="center">
+                                {dash.number && <span style={{ color: 'black' }}>#{bid.bid_id}</span>}
                                 {dash.price && <span>${bid.price}</span>}
                                 {dash.quality && <Chip label={`Quality: ${bid.quality}`} size="small" />}
-                                <span>{bid.name || bid.supplier_name}</span>
+                                {dash.name && <span>{bid.name || bid.supplier_name}</span>}
                               </Stack>
                             }
                           />
