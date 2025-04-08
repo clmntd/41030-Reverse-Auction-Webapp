@@ -7,6 +7,7 @@ import {
   Chip,
   Container,
   IconButton,
+  InputAdornment,
   List,
   ListItem,
   ListItemText,
@@ -417,6 +418,11 @@ const Auctions = () => {
                       variant="outlined"
                       size="small"
                       fullWidth
+                      slotProps={{
+                        input: {
+                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                        },
+                      }}
                       value={auctionValues[auction.id]?.price || ''}
                       onChange={(e) =>
                         handleAuctionValuesChange(auction.id, 'price', e.target.value)
@@ -429,11 +435,15 @@ const Auctions = () => {
                       variant="outlined"
                       size="small"
                       fullWidth
+                      slotProps={{
+                        inputLabel: {
+                          shrink: true,
+                        },
+                      }}
                       value={auctionValues[auction.id]?.quality || ''}
                       onChange={(e) =>
                         handleAuctionValuesChange(auction.id, 'quality', e.target.value)
                       }
-                      inputProps={{ min: 1, max: 5 }}
                       sx={{ flex: 1 }}
                     />
                     <Button
