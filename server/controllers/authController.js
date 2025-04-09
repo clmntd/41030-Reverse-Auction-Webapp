@@ -5,7 +5,7 @@ require('dotenv').config({ path: __dirname + '/../.env' });
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  const user = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+  const user = await pool.query('select * from users where email = $1', [email]);
   if (user.rows.length === 0) return res.status(400).json({ message: 'User not found' });
 
   const isMatch = await bcrypt.compare(password, user.rows[0].password);
@@ -18,10 +18,10 @@ const loginUser = async (req, res) => {
 
 const registerUser = async (req, res) => {
   const { name, email, password, role } = req.body;
-  console.log('HITT REGG');
+  console.log('authController.js registerUser HIT');
   try {
     //Check if user already exists
-    const checkUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const checkUser = await pool.query('select * from users where email = $1', [email]);
     if (checkUser.rows.length > 0) {
       return res.status(400).json({ message: 'User already exists' });
     }
@@ -30,7 +30,7 @@ const registerUser = async (req, res) => {
 
     //Insert the new user into the database
     const result = await pool.query(
-      'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role',
+      'insert into users (name, email, password, role) values ($1, $2, $3, $4) returning id, name, email, role',
       [name, email, hashedPassword, role]
     );
 

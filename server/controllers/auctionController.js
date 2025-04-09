@@ -12,14 +12,14 @@ const createAuction = async (req, res) => {
     }
     try {
         const result = await pool.query(
-            'insert into auctions (facilitator_id, status) values ($1, $2)',
+            'insert into auctions (facilitator_id, status) values ($1, $2) returning *',
             [facilitator_id, 'open']
         );
         res.json({ message: `Auction created!` });
         console.log('Auction created:', result.rows[0]);
         return result.rows[0];
     } catch (error) {
-        console.error('Error creating auction:', err);
+        console.error('Error creating auction:', error);
     }
 };
 
