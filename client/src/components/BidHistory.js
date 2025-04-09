@@ -143,8 +143,8 @@ const BidHistory = () => {
                   />
                   {isWinningBid && (
                     <Chip
-                      icon={<CheckCircleIcon fontSize="small" />}
-                      label="Winning Bid"
+                      // icon={<CheckCircleIcon fontSize="small" />}
+                      label="🏆 Winning Bid"
                       color="success"
                       size="small"
                       sx={{ ml: 2 }}
