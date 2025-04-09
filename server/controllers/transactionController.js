@@ -1,56 +1,64 @@
-const Transaction = require('../models/Transaction');
+const pool = require('../config/db');
 
-// Get all transactions
+//Get all transactions
 const getAllTransactions = async (req, res) => {
     try {
-        // Placeholder for database query
-        const transactions = [];
-        res.json(transactions);
+        const result = await pool.query('select transactions.id as transactions_id, transactions.auction_id, bids.id as bid_id, final_price, bids.price as bid_price, bids.supplier_id as supplier_id, bids.quality as quality,name from transactions inner join bids on bids.auction_id = transactions.auction_id inner join users on users.id = transactions.winner_id where transactions.final_price = bids.price');
+        res.json(result.rows);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching transactions', error: error.message });
+        console.error('Error getting transaction:', error);
+        res.status(500).json({ error: 'Error getting transaction' });
+    }
+};
+
+//Get transaction by id
+const getTransactionId =  async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('select * from transactions where id = $1', [id]);
+        console.log('transactionroute get:', result.rows);
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error getting transaction:', error);
+        res.status(500).json({ error: 'Error getting transaction' });
     }
 };
 
 //Get transactions by user ID
 const getTransactionsByUserId = async (req, res) => {
+    const { id } = req.params;
     try {
-        const userId = req.params.userId;
-        //Placeholder for database query
-        //In a real implementation, you would query the database for transactions
-        //where either winner_id or creator_id matches the userId
-        const transactions = [
-            {
-                id: 1,
-                auction_id: 'auction123',
-                winner_id: userId,
-                final_price: 1000
-            }
-        ];
-        res.json(transactions);
+        const result = await pool.query('select * from transactions inner join users on users.id = transactions.winner_id where users.id = $1', [id]);
+        res.json(result.rows);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching user transactions', error: error.message });
+        console.error('Error getting transactions:', error);
+        res.status(500).json({ error: 'Error getting transactions' });
     }
 };
 
 //Create a new transaction
 const createTransaction = async (req, res) => {
+    const { bidId } = req.body;
+    console.log('Transaction routes post / bidId: ', bidId);
+    const response = await pool.query('select * from bids where id = $1', [bidId]);
+    const bigdata = response.rows[0];
+    console.log('transactionRoutes bigdata.supplier_id:', bigdata.supplier_id);
+    res.json({ message: `Transaction recorded: ${bigdata.supplier_id} won auction ${bigdata.auction_id} for ${bigdata.price}` });
     try {
-        const { auctionId, winnerId, finalPrice } = req.body;
-        //Placeholder for database creation
-        const transaction = {
-            auction_id: auctionId,
-            winner_id: winnerId,
-            final_price: finalPrice,
-            created_at: Date.now(),
-        };
-        res.status(201).json(transaction);
+        const result = await pool.query(
+            'insert into transactions(auction_id, winner_id, final_price) values ($1, $2, $3)',
+            [bigdata.auction_id, bigdata.supplier_id, bigdata.price]
+        );
+        await pool.query('update auctions set status = $1 where id = $2', ['closed', bigdata.auction_id]);
     } catch (error) {
-        res.status(500).json({ message: 'Error creating transaction', error: error.message });
+        console.error('Error creating transaction:', error);
+        throw new Error('Error creating transaction');
     }
 };
 
 module.exports = {
     getAllTransactions,
     getTransactionsByUserId,
-    createTransaction
+    createTransaction,
+    getTransactionId
 };

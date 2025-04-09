@@ -94,8 +94,9 @@ const Login = ({ setUser }) => {
         {error && (
           <Typography
             variant="body2"
-            color="error"
+            color="white"
             sx={{
+              fontWeight: 700,
               mb: 2,
               py: 1,
               px: 2,
@@ -123,12 +124,6 @@ const Login = ({ setUser }) => {
             margin="normal"
             variant="outlined"
             sx={{ mb: 2 }}
-            InputProps={{
-              sx: {
-                borderRadius: 1,
-                '&:hover fieldset': { borderColor: 'primary.light' }
-              }
-            }}
           />
           <FormControl fullWidth margin="normal" variant="outlined" sx={{ mb: 2 }}>
             <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
