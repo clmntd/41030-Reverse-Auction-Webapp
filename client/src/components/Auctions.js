@@ -173,11 +173,11 @@ const Auctions = () => {
     if (role === 'facilitator') {
       const userId = user.id;
       try {
-        socket.emit('makeAuction');
         const result = await api.post('/auctions', {
           facilitator_id: userId,
         });
         if (result.status === 200) {
+          socket.emit('makeAuction');
           console.log(`Auction created successfully.`);
         }
       } catch (err) {
