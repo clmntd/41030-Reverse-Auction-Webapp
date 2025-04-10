@@ -21,7 +21,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 // const socket = io('http://localhost:5000'); //Server URL
 
-const socket = io(`http://${window.location.hostname}:5000`); //Server URL
+const socket = io(`http://${window.location.hostname}:5000`);
 
 socket.on('connect', () => {
   console.log('Connected to the server!');
