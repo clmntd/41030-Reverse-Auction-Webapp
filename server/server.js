@@ -61,9 +61,11 @@ const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
 
+app.use(cors());
+
 const io = require('socket.io')(server, {
     cors: {
-        origin: 'http://localhost:3000',
+        origin: '*', //Whitelist website
         methods: ['GET', 'POST']
     }
 });
