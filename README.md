@@ -35,10 +35,11 @@ npm run dev
 ```
 2. Start the frontend server:
 ```bash
-npm start
+npm start host
 ```
 3. Once both are running, open your browser and go to
-[http://localhost:3000](http://localhost:3000)
+[http://localhost:3000](http://localhost:3000) or `http://<your-local-IP>:3000`
+> **Note**: Use `ipconfig` (Windows) or `ifconfig/ip` a (Mac/Linux) to find your local IP.
 ---
 The page will reload when you make changes.\
 You may also see any lint errors in the console.

@@ -19,7 +19,10 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const socket = io('http://localhost:5000'); //Server URL
+// const socket = io('http://localhost:5000'); //Server URL
+
+const socket = io(`http://${window.location.hostname}:5000`); //Server URL
+
 socket.on('connect', () => {
   console.log('Connected to the server!');
   socket.emit('message', 'Hello, Server!');
