@@ -5,7 +5,7 @@ import axios from 'axios';
 const HOST = window.location.hostname;
 
 const api = axios.create({
-  baseURL: `http://${HOST}:5000/api`,
+  baseURL: `https://reverseauction-750b65ab1f17.herokuapp.com/`,
   headers: {
     "Content-Type": "application/json",
   },
