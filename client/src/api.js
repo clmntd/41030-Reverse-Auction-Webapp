@@ -2,10 +2,10 @@ import axios from 'axios';
 
 // const API_BASE_URL = "http://localhost:5000/api"; 
 // const API_BASE_URL = "http://192.168.0.78:5000/api"; 
-const HOST = window.location.hostname;
+// const HOST = window.location.hostname;
 
 const api = axios.create({
-  baseURL: `https://reverseauction-750b65ab1f17.herokuapp.com/`,
+  baseURL: `/api`,
   headers: {
     "Content-Type": "application/json",
   },

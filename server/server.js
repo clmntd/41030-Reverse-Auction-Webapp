@@ -56,6 +56,7 @@ if (app.router && app.router.stack) {
 //     console.log(`Server running on http://localhost:${PORT}`);
 // });
 
+//local
 // const PORT = process.env.PORT || 5000;
 // const server = app.listen(PORT, '0.0.0.0', () => {
 //     console.log(`Server running on http://localhost:${PORT}`);

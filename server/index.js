@@ -1,13 +1,20 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Auction API is running");
+app.use(express.static(path.join(__dirname, '../client/build')))
+if(process.env.NODE_ENV --- 'production'){
+  app.use(express.static(path.join(__dirname, '../client/build')))
+}
+console.log(path.join(__dirname, '../client/build'));
+
+app.get('/', (req, res) => {
+  res.send('Auction API is running');
 });
 
 //heroku
