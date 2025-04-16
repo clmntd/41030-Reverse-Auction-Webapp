@@ -4,10 +4,10 @@ const { createUser } = require('./userService');
 const createTestUser = async () => {
   try {
     const newUser = await createUser(
-      'Sup2', //name
-      'sup2@gmail.com', //email
+      'Test Facilitator', //name
+      'test@gmail.com', //email
       '12345678',  //password (will be hashed)
-      'supplier'
+      'facilitator'
     );
     console.log('Created User:', newUser);
   } catch (error) {
