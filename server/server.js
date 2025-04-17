@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path');
 
 const authRoutes = require('./routes/authRoutes');
 const auctionRoutes = require('./routes/auctionRoutes');
@@ -18,6 +19,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/auctions', auctionRoutes);
 app.use('/api/bids', bidRoutes);
 app.use('/api/transactions', transactionRoutes);
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 console.log("Registering routes...");
 
@@ -48,7 +52,11 @@ if (app.router && app.router.stack) {
     console.log('❌ No routes found!');
 }
 
-
+// The "catch-all" route handler: for any request that doesn't match API routes,
+// send back the React app's index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
 
 //Start the servercd 
 // const PORT = process.env.PORT || 5000;
