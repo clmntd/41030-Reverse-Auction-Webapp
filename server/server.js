@@ -52,6 +52,28 @@ if (app.router && app.router.stack) {
     console.log('❌ No routes found!');
 }
 
+// Debug: Print all routes to find the problematic one
+function printRoutes(stack, basePath = '') {
+  stack.forEach(layer => {
+    if (layer.route) {
+      const methods = Object.keys(layer.route.methods).join(', ').toUpperCase();
+      console.log(`ROUTE: ${methods} ${basePath}${layer.route.path}`);
+    } else if (layer.name === 'router' && layer.handle.stack) {
+      let path = layer.regexp.toString().split('\\')[1];
+      if (path) {
+        path = '/' + path;
+        printRoutes(layer.handle.stack, basePath + path);
+      } else {
+        printRoutes(layer.handle.stack, basePath);
+      }
+    }
+  });
+}
+
+console.log('======== DETAILED ROUTE INSPECTION ========');
+printRoutes(app._router.stack);
+console.log('==========================================');
+
 // The "catch-all" route handler: for any request that doesn't match API routes,
 // send back the React app's index.html file.
 app.get('*', (req, res) => {
@@ -74,8 +96,6 @@ const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
     console.log(`Server running on : ${PORT}`);
 });
-
-app.use(cors());
 
 const io = require('socket.io')(server, {
     cors: {
