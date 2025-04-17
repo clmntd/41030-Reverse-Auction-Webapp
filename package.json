@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon server/server.js",
-    "start": "npm install && nodemon server/server.js && nodemon server/createUser.js",
+    "start": "npm install && nodemon server/index.js && nodemon server/server.js && nodemon server/createUser.js",
     "heroku-postbuild": "cd client && npm install && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
