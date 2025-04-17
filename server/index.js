@@ -13,9 +13,9 @@ if(process.env.NODE_ENV === 'production'){
 }
 console.log(path.join(__dirname, '../client/build'));
 
-app.get('/', (req, res) => {
-  res.send('Auction API is running');
-});
+// app.get('/', (req, res) => {
+//   res.send('Auction API is running');
+// });
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
