@@ -2,17 +2,55 @@ const pool = require('../config/db');
 
 //Get all bids
 const getBids = async (req, res) => {
-  const bids = await pool.query(
-    'select bids.id as bid_id, auction_id, price, quality, users.name as name from public.bids inner join users on users.id = bids.supplier_id order by auction_id asc, bid_id asc');
+  const bids = await pool.query(`
+    SELECT 
+      bids.id AS bid_id, 
+      auction_id, 
+      price, 
+      quality, 
+      users.name AS name 
+    FROM 
+      public.bids 
+    INNER JOIN 
+      users 
+    ON 
+      users.id = bids.supplier_id 
+    ORDER BY 
+      auction_id ASC, 
+      bid_id ASC
+  `);
   return res.json({ bids: bids.rows });
 };
 
 // Get all bids where there are no winners (no transaction)
 const noWinner = async (req, res) => {
   try {
-    const result = await pool.query(
-      `select bids.id as bid_id, bids.auction_id, bids.price, bids.quality, users.name as supplier_name, supplier_id from bids inner join users on users.id = bids.supplier_id left join transactions on transactions.auction_id = bids.auction_id where transactions.auction_id is NULL order by auction_id asc, bids.id asc`
-    );
+    const query = `
+      SELECT 
+        bids.id AS bid_id, 
+        bids.auction_id, 
+        bids.price, 
+        bids.quality, 
+        users.name AS supplier_name, 
+        bids.supplier_id 
+      FROM 
+        bids 
+      INNER JOIN 
+        users 
+      ON 
+        users.id = bids.supplier_id 
+      LEFT JOIN 
+        transactions 
+      ON 
+        transactions.auction_id = bids.auction_id 
+      WHERE 
+        transactions.auction_id IS NULL 
+      ORDER BY 
+        bids.auction_id ASC, 
+        bids.id ASC
+    `;
+
+    const result = await pool.query(query);
     return res.json({ bids: result.rows });
   } catch (error) {
     console.error('Error fetching bids with no winners:', error);
@@ -24,8 +62,25 @@ const noWinner = async (req, res) => {
 const auctionBids = async (req, res) => {
   const { id } = req.params;
   try {
-    const bids = await pool.query(
-      'select bids.id as bid_id, auction_id, price, quality, users.name as name from bids inner join users on users.id = bids.supplier_id where auction_id = $1 order by auction_id asc', [id]);
+    const query = `
+      SELECT 
+        bids.id AS bid_id, 
+        auction_id, 
+        price, 
+        quality, 
+        users.name AS name 
+      FROM 
+        bids 
+      INNER JOIN 
+        users 
+      ON 
+        users.id = bids.supplier_id 
+      WHERE 
+        auction_id = $1 
+      ORDER BY 
+        auction_id ASC
+    `;
+    const bids = await pool.query(query, [id]);
     return res.json({ bids: bids.rows });
   } catch (error) {
     console.error('Error fetching bids:', error);

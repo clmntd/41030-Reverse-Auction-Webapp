@@ -10,7 +10,6 @@ import {
   Paper,
   Box
 } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const BidHistory = () => {
   const [bids, setBids] = useState([]);

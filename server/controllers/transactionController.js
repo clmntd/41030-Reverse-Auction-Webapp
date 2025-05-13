@@ -3,7 +3,29 @@ const pool = require('../config/db');
 //Get all transactions
 const getAllTransactions = async (req, res) => {
     try {
-        const result = await pool.query('select transactions.id as transactions_id, transactions.auction_id, bids.id as bid_id, final_price, bids.price as bid_price, bids.supplier_id as supplier_id, bids.quality as quality,name from transactions inner join bids on bids.auction_id = transactions.auction_id inner join users on users.id = transactions.winner_id where transactions.final_price = bids.price');
+        const result = await pool.query(`
+            SELECT 
+                transactions.id AS transactions_id, 
+                transactions.auction_id, 
+                bids.id AS bid_id, 
+                transactions.final_price, 
+                bids.price AS bid_price, 
+                bids.supplier_id AS supplier_id, 
+                bids.quality AS quality, 
+                users.name 
+            FROM 
+                transactions 
+            INNER JOIN 
+                bids 
+            ON 
+                bids.auction_id = transactions.auction_id 
+            INNER JOIN 
+                users 
+            ON 
+                users.id = transactions.winner_id 
+            WHERE 
+                transactions.final_price = bids.price
+        `);
         res.json(result.rows);
     } catch (error) {
         console.error('Error getting transaction:', error);
@@ -12,7 +34,7 @@ const getAllTransactions = async (req, res) => {
 };
 
 //Get transaction by id
-const getTransactionId =  async (req, res) => {
+const getTransactionId = async (req, res) => {
     const { id } = req.params;
     try {
         const result = await pool.query('select * from transactions where id = $1', [id]);

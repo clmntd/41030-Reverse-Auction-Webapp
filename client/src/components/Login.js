@@ -131,7 +131,7 @@ const Login = ({ setUser }) => {
               id="outlined-adornment-password"
               type={showPassword ? 'text' : 'password'}
               value={password}
-              onChange={(e) => setPassword(e.target.value)} // Corrected here to update password
+              onChange={(e) => setPassword(e.target.value)} 
               required
               endAdornment={
                 <InputAdornment position="end">
